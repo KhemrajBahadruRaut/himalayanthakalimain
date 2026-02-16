@@ -333,21 +333,26 @@ export default function MenuAdmin() {
                     >
                       <div className="flex gap-4 items-center">
                         {/* Image Container */}
-                        <div className="h-20 w-20 rounded-lg bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-200">
-                          {item.image_url ? (
-                            <img
-                              src={item.image_url}
-                              alt={item.name}
-                              className="h-full w-full object-cover"
-                              onError={(e) => {
-                                e.target.src =
-                                  "https://via.placeholder.com/80?text=No+Image";
-                              }}
-                            />
-                          ) : (
-                            <Utensils className="text-slate-300" size={24} />
-                          )}
-                        </div>
+                       <div className="h-20 w-20 rounded-lg bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-200">
+  {item.image_url ? (
+    <img
+      src={
+        item.image_url.startsWith("http")
+          ? item.image_url
+          : `https://api.himalayanthakali.com/${item.image_url.replace(/^\/+/, "")}`
+      }
+      alt={item.name || "Image"}
+      className="h-full w-full object-cover"
+      onError={(e) => {
+        e.currentTarget.src =
+          "https://via.placeholder.com/80?text=No+Image";
+      }}
+    />
+  ) : (
+    <Utensils className="text-slate-300" size={24} />
+  )}
+</div>
+
 
                         <div>
                           <h3 className="font-bold text-slate-800 uppercase tracking-wide">
