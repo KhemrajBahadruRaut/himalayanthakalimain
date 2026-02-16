@@ -2,32 +2,31 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    dangerouslyAllowLocalIP: true,
     remotePatterns: [
+      //  LOCAL DEVELOPMENT
+      // {
+      //   protocol: "http",
+      //   hostname: "localhost",
+      //   port: "",
+      //   pathname: "/himalayanthakali_backend/**",
+      // },
+
+      // PRODUCTION API
       {
-        protocol: "http",
-        hostname: "localhost",
-        port: "",
+        protocol: "https",
+        hostname: "api.himalayanthakali.com",
         pathname: "/himalayanthakali_backend/**",
       },
 
-      // PRODUCTION (COMMENTED AS REQUESTED)
-      // Uncomment these for production domain images and set
-      // dangerouslyAllowLocalIP to false.
+      // ( if serve images directly from main domain)
       // {
       //   protocol: "https",
       //   hostname: "himalayanthakali.com",
       //   pathname: "/himalayanthakali_backend/**",
       // },
-      // {
-      //   protocol: "https",
-      //   hostname: "www.himalayanthakali.com",
-      //   pathname: "/himalayanthakali_backend/**",
-      // },
     ],
 
-    // PRODUCTION VALUE (COMMENTED AS REQUESTED)
-    // dangerouslyAllowLocalIP: false,
+    dangerouslyAllowLocalIP: true, // needed for localhost images
   },
 };
 
