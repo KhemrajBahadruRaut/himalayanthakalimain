@@ -1,16 +1,14 @@
 import Image from "next/image";
 import Navbar from "@/components/layout/navbar/Navbar";
 import Footer from "@/components/layout/footer/Footer";
-import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
 const API_BASE =
-  process.env.NEXT_PUBLIC_API_BASE ||
   "https://api.himalayanthakali.com/himalayanthakali_backend";
 
 /* ======================================
-   Fetch Blog By ID (Server Side)
+   Fetch Blog By ID (Server Side Safe)
 ====================================== */
 async function getBlog(id) {
   if (!id) return null;
@@ -21,11 +19,18 @@ async function getBlog(id) {
       { cache: "no-store" }
     );
 
-    if (!res.ok) return null;
+    if (!res.ok) {
+      console.error("Fetch failed with status:", res.status);
+      return null;
+    }
 
     const data = await res.json();
-    return data.success ? data.data : null;
+
+    if (!data.success) return null;
+
+    return data.data;
   } catch (err) {
+    console.error("Server fetch error:", err);
     return null;
   }
 }
@@ -77,7 +82,13 @@ export default async function BlogDetails({ searchParams }) {
 
   const blog = await getBlog(id);
 
-  if (!blog) return notFound();
+  if (!blog) {
+    return (
+      <div style={{ padding: "120px", textAlign: "center" }}>
+        <h2>Blog not found</h2>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -91,7 +102,7 @@ export default async function BlogDetails({ searchParams }) {
             {blog.title}
           </h1>
 
-          {/* Image */}
+          {/* Featured Image */}
           {blog.image && (
             <div className="relative mb-10 h-96 w-full">
               <Image
