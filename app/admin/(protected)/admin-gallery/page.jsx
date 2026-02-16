@@ -5,7 +5,7 @@ import { useToast } from "@/components/providers/ToastProvider";
 
 export default function GalleryAdmin() {
   // const API = "http://localhost/himalayanthakali_backend/gallery";
-    const API = "https://api.himalayanthakali.com/himalayanthakali_backend";
+    const API = "https://api.himalayanthakali.com/himalayanthakali_backend/gallery";
 
 
   // ——————————————————————————————————————————————————————————————————————————

@@ -25,8 +25,6 @@ export default function AdminLogin() {
       { headers: { "Content-Type": "application/json" } }
     );
 
-    // console.log("PHP RESPONSE:", res.data);   // 👈 ADD THIS
-
     if (res.data.status === "success") {
       localStorage.setItem("admin_token", res.data.token);
       router.push("/admin/dashboard");

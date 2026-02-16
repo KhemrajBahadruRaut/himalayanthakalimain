@@ -7,7 +7,6 @@ import { LayoutDashboard, LogOut, Menu, X} from "lucide-react";
 import { Contact } from "lucide-react";
 import { MenuIcon } from "lucide-react";
 import { GalleryHorizontalEndIcon } from "lucide-react";
-import { Workflow } from "lucide-react";
 import { Newspaper } from "lucide-react";
 
 export default function AdminLayout({ children }) {
