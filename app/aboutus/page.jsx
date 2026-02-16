@@ -95,7 +95,7 @@ export default function HimalayantThakaliAbout() {
         </div>
       </div>
       <div className="inset-0 pointer-events-none overflow-hidden hidden sm:flex">
-        <div className="absolute top-120 right-0 w-64 h-64 ">
+        <div className="absolute top-120 right-10 w-64 h-64 ">
           <svg viewBox="0 0 200 200" className="decorative-circle">
             <circle
               cx="100"
@@ -118,7 +118,7 @@ export default function HimalayantThakaliAbout() {
             />
           </svg>
         </div>
-        <div className="absolute top-80 -left-30 w-64 h-64 ">
+        <div className="absolute top-80 -left-10 w-64 h-64 ">
           <svg viewBox="0 0 200 200" className="decorative-circle">
             <circle
               cx="100"

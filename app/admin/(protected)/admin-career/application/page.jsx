@@ -11,7 +11,9 @@ import {
   Filter
 } from "lucide-react";
 
-const API = "http://localhost/himalayanthakali_backend/application";
+// const API = "http://localhost/himalayanthakali_backend/application";
+  const API = "https://api.himalayanthakali.com/himalayanthakali_backend";
+
 
 export default function CareerApplications() {
   const [applications, setApplications] = useState([]);

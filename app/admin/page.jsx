@@ -19,7 +19,8 @@ export default function AdminLogin() {
 
   try {
     const res = await axios.post(
-      "http://localhost/himalayanthakali_backend/admin/admin_login.php",
+      // "http://localhost/himalayanthakali_backend/admin/admin_login.php",
+      "https://api.himalayanthakali.com/himalayanthakali_backend/admin/admin_login.php",
       { email, password },
       { headers: { "Content-Type": "application/json" } }
     );

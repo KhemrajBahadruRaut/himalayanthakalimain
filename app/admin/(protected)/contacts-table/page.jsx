@@ -12,7 +12,9 @@ export default function AdminContactPage() {
   const fetchMessages = async () => {
     try {
       const res = await fetch(
-        "http://localhost/himalayanthakali_backend/contacts/get-contacts.php"
+        // "http://localhost/himalayanthakali_backend/contacts/get-contacts.php"
+          "https://api.himalayanthakali.com/himalayanthakali_backend/contacts/get-contacts.php"
+
       );
       const data = await res.json();
       setMessages(data);
@@ -36,7 +38,8 @@ export default function AdminContactPage() {
 
     try {
       const res = await fetch(
-        "http://localhost/himalayanthakali_backend/contacts/delete-contact.php",
+        // "http://localhost/himalayanthakali_backend/contacts/delete-contact.php",
+        "https://api.himalayanthakali.com/himalayanthakali_backend/contacts/delete-contact.php",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -61,7 +64,8 @@ export default function AdminContactPage() {
   const saveEdit = async () => {
     try {
       const res = await fetch(
-        "http://localhost/himalayanthakali_backend/contacts/update-contact.php",
+        // "http://localhost/himalayanthakali_backend/contacts/update-contact.php",
+        "https://api.himalayanthakali.com/himalayanthakali_backend/contacts/update-contact.php",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

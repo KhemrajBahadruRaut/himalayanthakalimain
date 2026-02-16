@@ -13,7 +13,9 @@ import {
 } from "lucide-react";
 import { useToast } from "@/components/providers/ToastProvider";
 
-const API = "http://localhost/himalayanthakali_backend/career";
+// const API = "http://localhost/himalayanthakali_backend/career";
+  const API = "https://api.himalayanthakali.com/himalayanthakali_backend";
+
 
 export default function CareerAdmin() {
   const [activeTab, setActiveTab] = useState("jobs"); // "jobs" or "applications"

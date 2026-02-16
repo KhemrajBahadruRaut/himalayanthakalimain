@@ -6,7 +6,8 @@ import Footer from "../../components/layout/footer/Footer";
 import Navbar from "../../components/layout/navbar/Navbar";
 import { X, ZoomIn } from "lucide-react";
 
-const API = `${process.env.NEXT_PUBLIC_API_BASE || "http://localhost/himalayanthakali_backend"}/gallery`;
+// const API = `${process.env.NEXT_PUBLIC_API_BASE || "http://localhost/himalayanthakali_backend"}/gallery`;
+const API = `${process.env.NEXT_PUBLIC_API_BASE || "https://api.himalayanthakali.com/himalayanthakali_backend"}/gallery`;
 
 export default function ThakaliGallery() {
   const [activeFilter, setActiveFilter] = useState("All");

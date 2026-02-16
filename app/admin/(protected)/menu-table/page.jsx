@@ -25,7 +25,9 @@ export default function MenuAdmin() {
   });
   const { showToast, showConfirm } = useToast();
 
-  const API = "http://localhost/himalayanthakali_backend/menu";
+  // const API = "http://localhost/himalayanthakali_backend/menu";
+    const API = "https://api.himalayanthakali.com/himalayanthakali_backend/menu";
+
 
   const fetchCategories = async () => {
     try {

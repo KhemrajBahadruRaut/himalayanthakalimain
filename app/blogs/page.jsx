@@ -7,7 +7,8 @@ import { Calendar } from "lucide-react";
 import Navbar from "../../components/layout/navbar/Navbar";
 import Footer from "../../components/layout/footer/Footer";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost/himalayanthakali_backend";
+// const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost/himalayanthakali_backend";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "https://api.himalayanthakali.com/himalayanthakali_backend";
 
 const BlogListingPage = () => {
   const [blogPosts, setBlogPosts] = useState([]);

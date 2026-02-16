@@ -6,7 +6,8 @@ import "quill/dist/quill.snow.css";
 import { useToast } from "@/components/providers/ToastProvider";
 
 const AdminBlogs = () => {
-  const API_BASE = "http://localhost/himalayanthakali_backend";
+  // const API_BASE = "http://localhost/himalayanthakali_backend";
+  const API_BASE = "https://api.himalayanthakali.com/himalayanthakali_backend";
 
   const editorRef = useRef(null);
   const quillRef = useRef(null);

@@ -4,7 +4,9 @@ import { Plus, Trash2, FolderPlus, Image as ImageIcon, X, Edit3, Loader2 } from 
 import { useToast } from "@/components/providers/ToastProvider";
 
 export default function GalleryAdmin() {
-  const API = "http://localhost/himalayanthakali_backend/gallery";
+  // const API = "http://localhost/himalayanthakali_backend/gallery";
+    const API = "https://api.himalayanthakali.com/himalayanthakali_backend";
+
 
   // ——————————————————————————————————————————————————————————————————————————
   // STATE

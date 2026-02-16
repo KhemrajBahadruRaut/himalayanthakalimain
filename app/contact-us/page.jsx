@@ -6,7 +6,8 @@ import Navbar from "../../components/layout/navbar/Navbar.jsx";
 import Footer from "../../components/layout/footer/Footer.jsx";
 
 const CONTACT_API =
-  `${process.env.NEXT_PUBLIC_API_BASE || "http://localhost/himalayanthakali_backend"}/contacts/submit-contact.php`;
+  // `${process.env.NEXT_PUBLIC_API_BASE || "http://localhost/himalayanthakali_backend"}/contacts/submit-contact.php`;
+  `${process.env.NEXT_PUBLIC_API_BASE || "https://api.himalayanthakali.com/himalayanthakali_backend"}/contacts/submit-contact.php`;
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({

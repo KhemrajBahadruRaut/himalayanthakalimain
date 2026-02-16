@@ -6,8 +6,10 @@ import Footer from "../../components/layout/footer/Footer";
 import { useEffect } from "react";
 import { useToast } from "@/components/providers/ToastProvider";
 
-const API = "http://localhost/himalayanthakali_backend/career";
-const API2 = "http://localhost/himalayanthakali_backend/application";
+// const API = "http://localhost/himalayanthakali_backend/career";
+const API = "https://api.himalayanthakali.com/himalayanthakali_backend/career";
+// const API2 = "http://localhost/himalayanthakali_backend/application";
+const API2 = "https://api.himalayanthakali.com/himalayanthakali_backend/application";
 
 export default function CareerPage() {
   const [jobListings, setJobListings] = useState([]);
