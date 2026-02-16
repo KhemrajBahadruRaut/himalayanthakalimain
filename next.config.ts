@@ -4,12 +4,12 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       //  LOCAL DEVELOPMENT
-      // {
-      //   protocol: "http",
-      //   hostname: "localhost",
-      //   port: "",
-      //   pathname: "/himalayanthakali_backend/**",
-      // },
+      {
+        protocol: "http",
+        hostname: "localhost",
+        port: "",
+        pathname: "/himalayanthakali_backend/**",
+      },
 
       // PRODUCTION API
       {
