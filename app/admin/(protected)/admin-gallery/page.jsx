@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Plus, Trash2, FolderPlus, Image as ImageIcon, X, Edit3, Loader2 } from "lucide-react";
+import { useToast } from "@/components/providers/ToastProvider";
 
 export default function GalleryAdmin() {
   const API = "http://localhost/himalayanthakali_backend/gallery";
@@ -19,6 +20,7 @@ export default function GalleryAdmin() {
     span: "normal",
     image: null,
   });
+  const { showToast, showConfirm } = useToast();
 
   // ——————————————————————————————————————————————————————————————————————————
   // CATEGORY LOGIC
@@ -35,31 +37,57 @@ export default function GalleryAdmin() {
   };
 
   const addCategory = async () => {
-    if (!newCategory.trim()) return;
+    if (!newCategory.trim()) {
+      showToast("Enter a category name first.", "warning");
+      return;
+    }
     try {
-      await fetch(`${API}/add_category.php`, {
+      const res = await fetch(`${API}/add_category.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: newCategory }),
       });
+
+      const data = await res.json().catch(() => null);
+      if (!res.ok || data?.success === false) {
+        showToast(data?.message || "Failed to add category.", "error");
+        return;
+      }
+
       setNewCategory("");
-      fetchCategories();
+      await fetchCategories();
+      showToast(data?.message || "Category added.", "success");
     } catch (error) {
       console.error("Error adding category:", error);
+      showToast("Failed to add category.", "error");
     }
   };
 
   const deleteCategory = async (id) => {
-    if (!confirm("Delete this category and all its images?")) return;
+    const confirmed = await showConfirm("Delete this category and all its images?", {
+      type: "error",
+      confirmLabel: "Delete",
+    });
+    if (!confirmed) return;
+
     try {
-      await fetch(`${API}/delete_category.php?id=${id}`);
+      const res = await fetch(`${API}/delete_category.php?id=${id}`);
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok || data?.success === false) {
+        showToast(data?.message || "Failed to delete category.", "error");
+        return;
+      }
+
       if (activeCategory === id) {
         setActiveCategory(null);
         setGallery([]);
       }
-      fetchCategories();
+      await fetchCategories();
+      showToast(data?.message || "Category deleted.", "success");
     } catch (error) {
       console.error("Error deleting category:", error);
+      showToast("Failed to delete category.", "error");
     }
   };
 
@@ -72,6 +100,7 @@ export default function GalleryAdmin() {
     } catch (error) {
       console.error("Failed to fetch gallery:", error);
       setGallery([]);
+      showToast("Failed to load gallery.", "error");
     }
   };
 
@@ -94,17 +123,34 @@ export default function GalleryAdmin() {
   };
 
   const deleteImage = async (id) => {
-    if (!confirm("Delete this image?")) return;
+    const confirmed = await showConfirm("Delete this image?", {
+      type: "error",
+      confirmLabel: "Delete",
+    });
+    if (!confirmed) return;
+
     try {
-      await fetch(`${API}/delete_gallery.php?id=${id}`);
-      handleCategoryClick(activeCategory);
+      const res = await fetch(`${API}/delete_gallery.php?id=${id}`);
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok || data?.success === false) {
+        showToast(data?.message || "Failed to delete image.", "error");
+        return;
+      }
+
+      await handleCategoryClick(activeCategory);
+      showToast(data?.message || "Image deleted.", "success");
     } catch (error) {
       console.error("Error deleting image:", error);
+      showToast("Failed to delete image.", "error");
     }
   };
 
   const addImage = async () => {
-    if (!activeCategory) return;
+    if (!activeCategory) {
+      showToast("Select a category first.", "warning");
+      return;
+    }
     setIsSubmitting(true);
 
     const fd = new FormData();
@@ -117,14 +163,26 @@ export default function GalleryAdmin() {
     if (form.id) fd.append("id", form.id);
 
     try {
-      await fetch(`${API}/${endpoint}`, {
+      const res = await fetch(`${API}/${endpoint}`, {
         method: "POST",
         body: fd,
       });
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok || data?.success === false) {
+        showToast(data?.message || "Failed to save image.", "error");
+        return;
+      }
+
       setForm({ id: null, alt_text: "", span: "normal", image: null });
-      handleCategoryClick(activeCategory);
+      await handleCategoryClick(activeCategory);
+      showToast(
+        data?.message || (form.id ? "Image updated." : "Image uploaded."),
+        "success"
+      );
     } catch (error) {
       console.error("Upload failed:", error);
+      showToast("Failed to save image.", "error");
     } finally {
       setIsSubmitting(false);
     }

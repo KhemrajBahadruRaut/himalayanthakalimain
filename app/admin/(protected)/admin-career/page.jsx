@@ -9,10 +9,9 @@ import {
   Trash2, 
   MapPin, 
   Clock, 
-  CheckCircle2, 
-  AlertCircle,
   X 
 } from "lucide-react";
+import { useToast } from "@/components/providers/ToastProvider";
 
 const API = "http://localhost/himalayanthakali_backend/career";
 
@@ -22,7 +21,7 @@ export default function CareerAdmin() {
   const [editingId, setEditingId] = useState(null);
   const [careerEmail, setCareerEmail] = useState("");
   const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState({ type: "", message: "" });
+  const { showToast, showConfirm } = useToast();
 
   const [form, setForm] = useState({
     title: "",
@@ -33,27 +32,26 @@ export default function CareerAdmin() {
   });
 
   // ================= HELPERS =================
-  const showStatus = (type, message) => {
-    setStatus({ type, message });
-    setTimeout(() => setStatus({ type: "", message: "" }), 4000);
-  };
-
   const fetchJobs = useCallback(async () => {
     try {
       const res = await fetch(`${API}/get_openings.php`);
       const data = await res.json();
       if (data.success) setJobs(data.data);
-    } catch (err) {
-      showStatus("error", "Failed to load jobs");
+      else showToast(data.message || "Failed to load jobs.", "error");
+    } catch {
+      showToast("Failed to load jobs.", "error");
     }
-  }, []);
+  }, [showToast]);
 
   const fetchEmail = async () => {
     try {
       const res = await fetch(`${API}/get_career_email.php`);
       const data = await res.json();
       if (data.success) setCareerEmail(data.email);
-    } catch (err) {}
+      else showToast(data.message || "Failed to load email.", "error");
+    } catch {
+      showToast("Failed to load email.", "error");
+    }
   };
 
   useEffect(() => {
@@ -81,15 +79,15 @@ export default function CareerAdmin() {
       const data = await res.json();
 
       if (data.success) {
-        showStatus("success", editingId ? "Job updated!" : "Job added!");
+        showToast(editingId ? "Job updated." : "Job added.", "success");
         setForm({ title: "", description: "", experience: "", type: "Full-time", location: "" });
         setEditingId(null);
         fetchJobs();
       } else {
-        showStatus("error", data.message);
+        showToast(data.message || "Failed to save job.", "error");
       }
-    } catch (err) {
-      showStatus("error", "Connection error");
+    } catch {
+      showToast("Connection error.", "error");
     } finally {
       setLoading(false);
     }
@@ -108,7 +106,12 @@ export default function CareerAdmin() {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm("Are you sure?")) return;
+    const confirmed = await showConfirm("Delete this job opening?", {
+      type: "error",
+      confirmLabel: "Delete",
+    });
+    if (!confirmed) return;
+
     try {
       const res = await fetch(`${API}/delete_opening.php`, {
         method: "POST",
@@ -117,43 +120,43 @@ export default function CareerAdmin() {
       });
       const data = await res.json();
       if (data.success) {
-        showStatus("success", "Opening deleted");
+        showToast("Opening deleted.", "success");
         fetchJobs();
+      } else {
+        showToast(data.message || "Delete failed.", "error");
       }
-    } catch (err) {
-      showStatus("error", "Delete failed");
+    } catch {
+      showToast("Delete failed.", "error");
     }
   };
 
   const updateEmail = async () => {
-    const res = await fetch(`${API}/update_career_email.php`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: careerEmail }),
-    });
-    const data = await res.json();
-    showStatus(data.success ? "success" : "error", data.message);
+    try {
+      const res = await fetch(`${API}/update_career_email.php`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: careerEmail }),
+      });
+      const data = await res.json();
+      showToast(
+        data.message || (data.success ? "Email updated." : "Failed to update email."),
+        data.success ? "success" : "error"
+      );
+    } catch {
+      showToast("Failed to update email.", "error");
+    }
   };
 
   return (
     <div className="min-h-screen bg-zinc-50 text-zinc-800">
       <div className="max-w-6xl mx-auto">
         
-        {/* Header & Status */}
+        {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Career Dashboard</h1>
             <p className="text-zinc-500">Manage job openings and candidate applications</p>
           </div>
-          
-          {status.message && (
-            <div className={`flex items-center gap-2 px-4 py-2 rounded-lg animate-in fade-in slide-in-from-top-2 ${
-              status.type === "success" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
-            }`}>
-              {status.type === "success" ? <CheckCircle2 size={18}/> : <AlertCircle size={18}/>}
-              <span className="text-sm font-medium">{status.message}</span>
-            </div>
-          )}
         </div>
 
         {/* Tab Navigation */}

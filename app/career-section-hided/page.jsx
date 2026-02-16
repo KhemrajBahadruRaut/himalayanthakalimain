@@ -4,6 +4,7 @@ import { useState } from "react";
 import Navbar from "../../components/layout/navbar/Navbar";
 import Footer from "../../components/layout/footer/Footer";
 import { useEffect } from "react";
+import { useToast } from "@/components/providers/ToastProvider";
 
 const API = "http://localhost/himalayanthakali_backend/career";
 const API2 = "http://localhost/himalayanthakali_backend/application";
@@ -13,6 +14,7 @@ export default function CareerPage() {
   const [careerEmail, setCareerEmail] = useState("abc@example.com");
   const [selectedJob, setSelectedJob] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const { showToast } = useToast();
   const [formData, setFormData] = useState({
     full_name: "",
     email: "",
@@ -57,7 +59,10 @@ export default function CareerPage() {
     });
 
     const data = await res.json();
-    alert(data.message);
+    showToast(
+      data.message || (data.success ? "Application submitted." : "Submission failed."),
+      data.success ? "success" : "error"
+    );
 
     if (data.success) {
       closeModal();

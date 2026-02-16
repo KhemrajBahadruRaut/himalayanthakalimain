@@ -8,6 +8,7 @@ import {
   Image as ImageIcon,
   Loader2,
 } from "lucide-react";
+import { useToast } from "@/components/providers/ToastProvider";
 
 export default function MenuAdmin() {
   const [categories, setCategories] = useState([]);
@@ -22,6 +23,7 @@ export default function MenuAdmin() {
     price: "",
     image: null,
   });
+  const { showToast, showConfirm } = useToast();
 
   const API = "http://localhost/himalayanthakali_backend/menu";
 
@@ -35,6 +37,7 @@ export default function MenuAdmin() {
       }
     } catch (error) {
       console.error("Failed to fetch categories", error);
+      showToast("Failed to fetch categories.", "error");
     }
   };
 
@@ -49,6 +52,10 @@ export default function MenuAdmin() {
       const res = await fetch(`${API}/get_items.php?category_id=${id}`);
       const data = await res.json();
       setItems(data);
+    } catch (error) {
+      console.error("Failed to fetch items", error);
+      setItems([]);
+      showToast("Failed to fetch items.", "error");
     } finally {
       setLoading(false);
     }
@@ -59,26 +66,62 @@ export default function MenuAdmin() {
   }, []);
 
   const addCategory = async () => {
-    if (!newCategory) return;
-    await fetch(`${API}/add_category.php`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: newCategory }),
-    });
-    setNewCategory("");
-    fetchCategories();
+    if (!newCategory) {
+      showToast("Enter a category name first.", "warning");
+      return;
+    }
+    try {
+      const res = await fetch(`${API}/add_category.php`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: newCategory }),
+      });
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok || data?.success === false) {
+        showToast(data?.message || "Failed to add category.", "error");
+        return;
+      }
+
+      setNewCategory("");
+      await fetchCategories();
+      showToast(data?.message || "Category added.", "success");
+    } catch (error) {
+      console.error("Failed to add category", error);
+      showToast("Failed to add category.", "error");
+    }
   };
 
   const deleteCategory = async (id) => {
-    if (!confirm("Are you sure? This will delete all items in this category."))
-      return;
-    await fetch(`${API}/delete_category.php?id=${id}`);
-    fetchCategories();
-    setItems([]);
+    const confirmed = await showConfirm(
+      "Delete this category and all its menu items?",
+      { type: "error", confirmLabel: "Delete" }
+    );
+    if (!confirmed) return;
+
+    try {
+      const res = await fetch(`${API}/delete_category.php?id=${id}`);
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok || data?.success === false) {
+        showToast(data?.message || "Failed to delete category.", "error");
+        return;
+      }
+
+      await fetchCategories();
+      setItems([]);
+      showToast(data?.message || "Category deleted.", "success");
+    } catch (error) {
+      console.error("Failed to delete category", error);
+      showToast("Failed to delete category.", "error");
+    }
   };
 
   const addItem = async () => {
-    if (!activeCategory || !form.name || !form.price) return;
+    if (!activeCategory || !form.name || !form.price) {
+      showToast("Category, name and price are required.", "warning");
+      return;
+    }
 
     const fd = new FormData();
     fd.append("category_id", activeCategory);
@@ -87,19 +130,49 @@ export default function MenuAdmin() {
     fd.append("price", form.price);
     if (form.image) fd.append("image", form.image);
 
-    await fetch(`${API}/add_item.php`, {
-      method: "POST",
-      body: fd,
-    });
+    try {
+      const res = await fetch(`${API}/add_item.php`, {
+        method: "POST",
+        body: fd,
+      });
+      const data = await res.json().catch(() => null);
 
-    setForm({ name: "", description: "", price: "", image: null });
-    fetchItems(activeCategory);
+      if (!res.ok || data?.success === false) {
+        showToast(data?.message || "Failed to add menu item.", "error");
+        return;
+      }
+
+      setForm({ name: "", description: "", price: "", image: null });
+      await fetchItems(activeCategory);
+      showToast(data?.message || "Menu item added.", "success");
+    } catch (error) {
+      console.error("Failed to add menu item", error);
+      showToast("Failed to add menu item.", "error");
+    }
   };
 
   const deleteItem = async (id) => {
-    if (!confirm("Delete this item?")) return;
-    await fetch(`${API}/delete_item.php?id=${id}`);
-    fetchItems(activeCategory);
+    const confirmed = await showConfirm("Delete this item?", {
+      type: "error",
+      confirmLabel: "Delete",
+    });
+    if (!confirmed) return;
+
+    try {
+      const res = await fetch(`${API}/delete_item.php?id=${id}`);
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok || data?.success === false) {
+        showToast(data?.message || "Failed to delete item.", "error");
+        return;
+      }
+
+      await fetchItems(activeCategory);
+      showToast(data?.message || "Menu item deleted.", "success");
+    } catch (error) {
+      console.error("Failed to delete item", error);
+      showToast("Failed to delete item.", "error");
+    }
   };
 
   return (

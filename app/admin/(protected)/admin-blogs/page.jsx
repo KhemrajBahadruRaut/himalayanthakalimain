@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import Quill from "quill";
 import "quill/dist/quill.snow.css";
+import { useToast } from "@/components/providers/ToastProvider";
 
 const AdminBlogs = () => {
   const API_BASE = "http://localhost/himalayanthakali_backend";
@@ -13,6 +14,7 @@ const AdminBlogs = () => {
   const [blogs, setBlogs] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [imageFile, setImageFile] = useState(null);
+  const { showToast, showConfirm } = useToast();
 
   const [formData, setFormData] = useState({
     title: "",
@@ -105,9 +107,11 @@ const AdminBlogs = () => {
     const data = await res.json();
 
     if (data.success) {
-      alert("Blog Created");
+      showToast("Blog created.", "success");
       resetForm();
       fetchBlogs();
+    } else {
+      showToast(data.message || "Failed to create blog.", "error");
     }
   };
 
@@ -133,14 +137,20 @@ const AdminBlogs = () => {
     const data = await res.json();
 
     if (data.success) {
-      alert("Blog Updated");
+      showToast("Blog updated.", "success");
       resetForm();
       fetchBlogs();
+    } else {
+      showToast(data.message || "Failed to update blog.", "error");
     }
   };
 
   const handleDelete = async (id) => {
-    if (!confirm("Delete this blog?")) return;
+    const confirmed = await showConfirm("Delete this blog?", {
+      type: "error",
+      confirmLabel: "Delete",
+    });
+    if (!confirmed) return;
 
     const res = await fetch(`${API_BASE}/blogs/delete_blog.php`, {
       method: "POST",
@@ -151,8 +161,10 @@ const AdminBlogs = () => {
     const data = await res.json();
 
     if (data.success) {
-      alert("Blog Deleted");
+      showToast("Blog deleted.", "success");
       fetchBlogs();
+    } else {
+      showToast(data.message || "Failed to delete blog.", "error");
     }
   };
 

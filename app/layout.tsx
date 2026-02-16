@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
+import { ToastProvider } from "@/components/providers/ToastProvider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -86,14 +87,16 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className="scroll-smooth">
       <body className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased bg-white text-slate-900`}>
-        <a href="#main-content" className="skip-link">
-          Skip to main content
-        </a>
-        <div className="flex flex-col min-h-screen">
-          <main id="main-content" className="grow">
-            {children}
-          </main>
-        </div>
+        <ToastProvider>
+          <a href="#main-content" className="skip-link">
+            Skip to main content
+          </a>
+          <div className="flex flex-col min-h-screen">
+            <main id="main-content" className="grow">
+              {children}
+            </main>
+          </div>
+        </ToastProvider>
       </body>
     </html>
   );

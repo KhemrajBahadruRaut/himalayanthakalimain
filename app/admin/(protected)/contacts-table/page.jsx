@@ -2,17 +2,25 @@
 
 import { Contact } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useToast } from "@/components/providers/ToastProvider";
 
 export default function AdminContactPage() {
   const [messages, setMessages] = useState([]);
   const [editing, setEditing] = useState(null);
+  const { showToast, showConfirm } = useToast();
 
   const fetchMessages = async () => {
-    const res = await fetch(
-      "http://localhost/himalayanthakali_backend/contacts/get-contacts.php"
-    );
-    const data = await res.json();
-    setMessages(data);
+    try {
+      const res = await fetch(
+        "http://localhost/himalayanthakali_backend/contacts/get-contacts.php"
+      );
+      const data = await res.json();
+      setMessages(data);
+    } catch (error) {
+      console.error("Failed to fetch messages:", error);
+      setMessages([]);
+      showToast("Failed to load contact messages.", "error");
+    }
   };
 
   useEffect(() => {
@@ -20,32 +28,60 @@ export default function AdminContactPage() {
   }, []);
 
   const deleteMessage = async (id) => {
-    if (!confirm("Delete this message?")) return;
+    const confirmed = await showConfirm("Delete this message?", {
+      type: "error",
+      confirmLabel: "Delete",
+    });
+    if (!confirmed) return;
 
-    await fetch(
-      "http://localhost/himalayanthakali_backend/contacts/delete-contact.php",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id }),
+    try {
+      const res = await fetch(
+        "http://localhost/himalayanthakali_backend/contacts/delete-contact.php",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id }),
+        }
+      );
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok || data?.success === false) {
+        showToast(data?.message || "Failed to delete message.", "error");
+        return;
       }
-    );
 
-    fetchMessages();
+      await fetchMessages();
+      showToast(data?.message || "Message deleted.", "success");
+    } catch (error) {
+      console.error("Failed to delete message:", error);
+      showToast("Failed to delete message.", "error");
+    }
   };
 
   const saveEdit = async () => {
-    await fetch(
-      "http://localhost/himalayanthakali_backend/contacts/update-contact.php",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(editing),
-      }
-    );
+    try {
+      const res = await fetch(
+        "http://localhost/himalayanthakali_backend/contacts/update-contact.php",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(editing),
+        }
+      );
+      const data = await res.json().catch(() => null);
 
-    setEditing(null);
-    fetchMessages();
+      if (!res.ok || data?.success === false) {
+        showToast(data?.message || "Failed to update message.", "error");
+        return;
+      }
+
+      setEditing(null);
+      await fetchMessages();
+      showToast(data?.message || "Message updated.", "success");
+    } catch (error) {
+      console.error("Failed to update message:", error);
+      showToast("Failed to update message.", "error");
+    }
   };
 
   return (

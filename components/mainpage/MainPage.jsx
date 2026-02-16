@@ -108,7 +108,7 @@ export default function MainPage() {
           <div className="relative w-full aspect-square flex items-center justify-center">
             {/* Outer decorative dashed circle - Hidden on very small screens for cleanliness */}
             <div
-              className="absolute inset-0 border-3 border-dashed border-[#E9842C]/60 rounded-full animate-spin-slow"
+              className="absolute inset-0 border-3 border-dashed border-[#E9842C]/60 rounded-full animate-spin"
               style={{ animationDuration: "45s" }}
             />
 
