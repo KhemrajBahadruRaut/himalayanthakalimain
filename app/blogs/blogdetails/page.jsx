@@ -7,9 +7,9 @@ export const dynamic = "force-dynamic";
 const API_BASE =
   "https://api.himalayanthakali.com/himalayanthakali_backend";
 
-/* ======================================
-   Fetch Blog By ID (Server Side Safe)
-====================================== */
+/* ===============================
+   Fetch Blog By ID
+================================ */
 async function getBlog(id) {
   if (!id) return null;
 
@@ -19,27 +19,20 @@ async function getBlog(id) {
       { cache: "no-store" }
     );
 
-    if (!res.ok) {
-      console.error("Fetch failed with status:", res.status);
-      return null;
-    }
+    if (!res.ok) return null;
 
     const data = await res.json();
-
-    if (!data.success) return null;
-
-    return data.data;
+    return data.success ? data.data : null;
   } catch (err) {
-    console.error("Server fetch error:", err);
     return null;
   }
 }
 
-/* ======================================
-   Dynamic Metadata (Facebook + SEO)
-====================================== */
-export async function generateMetadata({ searchParams }) {
-  const id = searchParams?.id;
+/* ===============================
+   Dynamic Metadata
+================================ */
+export async function generateMetadata(props) {
+  const id = props.searchParams?.id;
   if (!id) return {};
 
   const blog = await getBlog(id);
@@ -74,30 +67,66 @@ export async function generateMetadata({ searchParams }) {
   };
 }
 
-/* ======================================
-   Server Rendered Page
-====================================== */
+/* ===============================
+   Page Component
+================================ */
 export default async function BlogDetails(props) {
   const id = props.searchParams?.id;
 
   if (!id) {
-    return <div style={{ padding: "100px" }}>No ID provided</div>;
+    return (
+      <div style={{ padding: "120px", textAlign: "center" }}>
+        No blog ID provided.
+      </div>
+    );
   }
 
   const blog = await getBlog(id);
 
   if (!blog) {
-    return <div style={{ padding: "100px" }}>Blog not found (ID: {id})</div>;
+    return (
+      <div style={{ padding: "120px", textAlign: "center" }}>
+        Blog not found.
+      </div>
+    );
   }
 
   return (
     <>
       <Navbar />
-      <div style={{ padding: "100px", color: "white" }}>
-        <h1>{blog.title}</h1>
+
+      <div className="bg-[#1E1E1E] text-white px-4 pt-30 pb-20">
+        <article className="max-w-4xl mx-auto">
+
+          <h1 className="text-4xl font-serif mb-6">
+            {blog.title}
+          </h1>
+
+          {blog.image && (
+            <div className="relative mb-10 h-96 w-full">
+              <Image
+                src={`${API_BASE}/${blog.image}`}
+                alt={blog.title}
+                fill
+                priority
+                sizes="(max-width: 1024px) 100vw, 1024px"
+                className="rounded object-cover"
+              />
+            </div>
+          )}
+
+          <time className="text-gray-400 mb-10 block">
+            {new Date(blog.created_at).toDateString()}
+          </time>
+
+          <div
+            className="blog-content text-gray-300 leading-8"
+            dangerouslySetInnerHTML={{ __html: blog.content }}
+          />
+        </article>
       </div>
+
       <Footer />
     </>
   );
 }
-
