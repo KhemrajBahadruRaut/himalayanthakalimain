@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
+import Skeleton from "@/components/ui/Skeleton";
 
 const Navbar = dynamic(() => import("../../components/layout/navbar/Navbar"), {
   loading: () => <div className="h-24" />,
@@ -15,13 +16,47 @@ const Footer = dynamic(() => import("../../components/layout/footer/Footer"), {
 // const API = `${process.env.NEXT_PUBLIC_API_BASE || "http://localhost/himalayanthakali_backend"}/menu`;
 const API = `${process.env.NEXT_PUBLIC_API_BASE || "https://api.himalayanthakali.com/himalayanthakali_backend"}/menu`;
 
+function MenuCategorySkeleton() {
+  return (
+    <ul className="flex min-w-max gap-2 lg:min-w-0 lg:flex-col">
+      {Array.from({ length: 6 }).map((_, index) => (
+        <li key={`cat-skeleton-${index}`}>
+          <Skeleton className="h-10 w-28 rounded bg-white/10 lg:w-full" />
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function MenuItemsSkeleton() {
+  return (
+    <section className="mx-auto mb-10 grid max-w-6xl grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
+      {Array.from({ length: 4 }).map((_, index) => (
+        <div
+          key={`item-skeleton-${index}`}
+          className="rounded-lg bg-gray-800/50 p-6"
+        >
+          <Skeleton className="mx-auto mb-4 aspect-square max-w-55 rounded-full bg-white/10" />
+          <Skeleton className="mx-auto mb-2 h-6 w-3/4 bg-white/10" />
+          <Skeleton className="mx-auto mb-2 h-4 w-full bg-white/10" />
+          <Skeleton className="mx-auto mb-4 h-4 w-5/6 bg-white/10" />
+          <Skeleton className="mx-auto h-5 w-28 bg-white/10" />
+        </div>
+      ))}
+    </section>
+  );
+}
+
 const MenuPage = () => {
   const [categories, setCategories] = useState([]);
   const [activeCategory, setActiveCategory] = useState(null);
   const [items, setItems] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [isItemsLoading, setIsItemsLoading] = useState(false);
 
   const fetchItems = async (id) => {
+    setIsItemsLoading(true);
     try {
       setActiveCategory(id);
       const res = await fetch(`${API}/get_items.php?category_id=${id}`);
@@ -29,6 +64,9 @@ const MenuPage = () => {
       setItems(data);
     } catch (err) {
       console.error("Error fetching items:", err);
+      setItems([]);
+    } finally {
+      setIsItemsLoading(false);
     }
   };
 
@@ -36,6 +74,7 @@ const MenuPage = () => {
     let isCancelled = false;
 
     const loadInitialMenu = async () => {
+      setIsInitialLoading(true);
       try {
         const categoriesRes = await fetch(`${API}/get_categories.php`);
         const categoriesData = await categoriesRes.json();
@@ -55,6 +94,10 @@ const MenuPage = () => {
         }
       } catch (err) {
         console.error("Error loading initial menu:", err);
+      } finally {
+        if (!isCancelled) {
+          setIsInitialLoading(false);
+        }
       }
     };
 
@@ -88,24 +131,28 @@ const MenuPage = () => {
             </h2>
 
             <nav aria-label="Menu categories" className="overflow-x-auto lg:overflow-visible">
-              <ul className="flex min-w-max gap-2 lg:min-w-0 lg:flex-col">
-                {categories.map((category) => (
-                  <li key={category.id}>
-                    <button
-                      type="button"
-                      onClick={() => fetchItems(category.id)}
-                      aria-pressed={activeCategory === category.id}
-                      className={`w-full whitespace-nowrap rounded px-4 py-2 text-sm transition-colors lg:text-base ${
-                        activeCategory === category.id
-                          ? "bg-orange-500 font-medium text-white"
-                          : "text-gray-300 hover:bg-gray-700"
-                      }`}
-                    >
-                      {category.name}
-                    </button>
-                  </li>
-                ))}
-              </ul>
+              {isInitialLoading ? (
+                <MenuCategorySkeleton />
+              ) : (
+                <ul className="flex min-w-max gap-2 lg:min-w-0 lg:flex-col">
+                  {categories.map((category) => (
+                    <li key={category.id}>
+                      <button
+                        type="button"
+                        onClick={() => fetchItems(category.id)}
+                        aria-pressed={activeCategory === category.id}
+                        className={`w-full whitespace-nowrap rounded px-4 py-2 text-sm transition-colors lg:text-base ${
+                          activeCategory === category.id
+                            ? "bg-orange-500 font-medium text-white"
+                            : "text-gray-300 hover:bg-gray-700"
+                        }`}
+                      >
+                        {category.name}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </nav>
           </aside>
 
@@ -124,7 +171,9 @@ const MenuPage = () => {
               <h1 className="text-2xl font-serif sm:text-3xl lg:text-4xl">From Our Kitchen</h1>
             </div>
 
-            {items.length === 0 ? (
+            {isInitialLoading || isItemsLoading ? (
+              <MenuItemsSkeleton />
+            ) : items.length === 0 ? (
               <div className="flex items-center justify-center py-20">
                 <div className="text-center">
                   <h3 className="mb-2 text-xl font-semibold text-gray-300">No Items Available</h3>

@@ -85,7 +85,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className="scroll-smooth">
+    <html lang="en" className="scroll-smooth" data-scroll-behavior="smooth">
       <body className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased bg-white text-slate-900`}>
         <ToastProvider>
           <a href="#main-content" className="skip-link">

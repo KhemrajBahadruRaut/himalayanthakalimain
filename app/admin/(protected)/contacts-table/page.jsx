@@ -3,13 +3,16 @@
 import { Contact } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useToast } from "@/components/providers/ToastProvider";
+import Skeleton from "@/components/ui/Skeleton";
 
 export default function AdminContactPage() {
   const [messages, setMessages] = useState([]);
   const [editing, setEditing] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const { showToast, showConfirm } = useToast();
 
   const fetchMessages = async () => {
+    setIsLoading(true);
     try {
       const res = await fetch(
         // "http://localhost/himalayanthakali_backend/contacts/get-contacts.php"
@@ -22,6 +25,8 @@ export default function AdminContactPage() {
       console.error("Failed to fetch messages:", error);
       setMessages([]);
       showToast("Failed to load contact messages.", "error");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -61,32 +66,32 @@ export default function AdminContactPage() {
     }
   };
 
-  const saveEdit = async () => {
-    try {
-      const res = await fetch(
-        // "http://localhost/himalayanthakali_backend/contacts/update-contact.php",
-        "https://api.himalayanthakali.com/himalayanthakali_backend/contacts/update-contact.php",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(editing),
-        }
-      );
-      const data = await res.json().catch(() => null);
+  // const saveEdit = async () => {
+  //   try {
+  //     const res = await fetch(
+  //       // "http://localhost/himalayanthakali_backend/contacts/update-contact.php",
+  //       "https://api.himalayanthakali.com/himalayanthakali_backend/contacts/update-contact.php",
+  //       {
+  //         method: "POST",
+  //         headers: { "Content-Type": "application/json" },
+  //         body: JSON.stringify(editing),
+  //       }
+  //     );
+  //     const data = await res.json().catch(() => null);
 
-      if (!res.ok || data?.success === false) {
-        showToast(data?.message || "Failed to update message.", "error");
-        return;
-      }
+  //     if (!res.ok || data?.success === false) {
+  //       showToast(data?.message || "Failed to update message.", "error");
+  //       return;
+  //     }
 
-      setEditing(null);
-      await fetchMessages();
-      showToast(data?.message || "Message updated.", "success");
-    } catch (error) {
-      console.error("Failed to update message:", error);
-      showToast("Failed to update message.", "error");
-    }
-  };
+  //     setEditing(null);
+  //     await fetchMessages();
+  //     showToast(data?.message || "Message updated.", "success");
+  //   } catch (error) {
+  //     console.error("Failed to update message:", error);
+  //     showToast("Failed to update message.", "error");
+  //   }
+  // };
 
   return (
     <div className="min-h-screen ">
@@ -111,42 +116,75 @@ export default function AdminContactPage() {
           </thead>
 
           <tbody>
-            {messages.map((msg) => (
-              <tr
-                key={msg.id}
-                className="border-b hover:bg-gray-50"
-              >
-                <td className="px-4 py-3">
-                  {msg.full_name}
-                </td>
-                <td className="px-4 py-3">
-                  {msg.email}
-                </td>
-                <td className="px-4 py-3">
-                  {msg.phone}
-                </td>
-                <td className="px-4 py-3 max-w-xs truncate">
-                  {msg.message}
-                </td>
-                <td className="px-4 py-2 text-xs text-gray-500">
-                  {new Date(msg.created_at).toLocaleString()}
-                </td>
-                <td className="px-4 py-2 flex gap-2 justify-center">
-                  <button
-                    onClick={() => setEditing(msg)}
-                    className="px-3 py-1 text-xs bg-blue-500 text-white  hover:bg-blue-600"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => deleteMessage(msg.id)}
-                    className="px-3 py-1 text-xs bg-red-500 text-white hover:bg-red-600"
-                  >
-                    Delete
-                  </button>
+            {isLoading ? (
+              Array.from({ length: 5 }).map((_, index) => (
+                <tr key={`contact-row-skeleton-${index}`} className="border-b">
+                  <td className="px-4 py-3">
+                    <Skeleton className="h-4 w-28" />
+                  </td>
+                  <td className="px-4 py-3">
+                    <Skeleton className="h-4 w-36" />
+                  </td>
+                  <td className="px-4 py-3">
+                    <Skeleton className="h-4 w-24" />
+                  </td>
+                  <td className="px-4 py-3">
+                    <Skeleton className="h-4 w-full max-w-xs" />
+                  </td>
+                  <td className="px-4 py-2">
+                    <Skeleton className="h-4 w-24" />
+                  </td>
+                  <td className="px-4 py-2">
+                    <div className="flex justify-center">
+                      <Skeleton className="h-7 w-16" />
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : messages.length === 0 ? (
+              <tr>
+                <td colSpan={6} className="px-4 py-10 text-center text-gray-500">
+                  No contact messages found.
                 </td>
               </tr>
-            ))}
+            ) : (
+              messages.map((msg) => (
+                <tr
+                  key={msg.id}
+                  className="border-b hover:bg-gray-50"
+                >
+                  <td className="px-4 py-3">
+                    {msg.full_name}
+                  </td>
+                  <td className="px-4 py-3">
+                    {msg.email}
+                  </td>
+                  <td className="px-4 py-3">
+                    {msg.phone}
+                  </td>
+                  <td className="px-4 py-3 max-w-xs truncate">
+                    {msg.message}
+                  </td>
+                  <td className="px-4 py-2 text-xs text-gray-500">
+                    {new Date(msg.created_at).toLocaleString()}
+                  </td>
+                  <td className="px-4 py-2 flex gap-2 justify-center">
+                    {/* <button
+                      onClick={() => setEditing(msg)}
+                      className="px-3 py-1 text-xs bg-blue-500 text-white  hover:bg-blue-600"
+                    >
+                      Edit
+                    </button> */}
+                    <button
+                      onClick={() => deleteMessage(msg.id)}
+                      className="px-3 py-1 text-xs bg-red-500 text-white hover:bg-red-600"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

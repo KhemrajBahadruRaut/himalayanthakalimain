@@ -33,9 +33,17 @@ async function getBlog(id) {
   }
 }
 
-export default async function BlogDetails({ searchParams }) {
-  // DO NOT use await here
-  const id = searchParams?.id;
+export default async function BlogDetails({ searchParams, params }) {
+  const resolvedSearchParams = await searchParams;
+  const resolvedParams = await params;
+
+  const searchId = Array.isArray(resolvedSearchParams?.id)
+    ? resolvedSearchParams?.id[0]
+    : resolvedSearchParams?.id;
+  const paramId = Array.isArray(resolvedParams?.id)
+    ? resolvedParams?.id[0]
+    : resolvedParams?.id;
+  const id = searchId || paramId;
 
   if (!id) {
     return (

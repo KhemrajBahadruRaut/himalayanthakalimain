@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import "quill/dist/quill.snow.css";
 import { useToast } from "@/components/providers/ToastProvider";
+import Skeleton from "@/components/ui/Skeleton";
 
 const AdminBlogs = () => {
   // const API_BASE = "http://localhost/himalayanthakali_backend";
@@ -15,6 +16,7 @@ const AdminBlogs = () => {
   const [editingId, setEditingId] = useState(null);
   const [imageFile, setImageFile] = useState(null);
   const [editorLoading, setEditorLoading] = useState(true);
+  const [blogsLoading, setBlogsLoading] = useState(true);
   const { showToast, showConfirm } = useToast();
 
   const [formData, setFormData] = useState({
@@ -77,10 +79,20 @@ const AdminBlogs = () => {
 
   // ================= Fetch Blogs =================
   const fetchBlogs = async () => {
-    const res = await fetch(`${API_BASE}/blogs/get_blogs.php`);
-    const data = await res.json();
-    if (data.success) {
-      setBlogs(data.data);
+    setBlogsLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/blogs/get_blogs.php`);
+      const data = await res.json();
+      if (data.success) {
+        setBlogs(data.data);
+      } else {
+        setBlogs([]);
+      }
+    } catch (error) {
+      console.error("Failed to fetch blogs:", error);
+      setBlogs([]);
+    } finally {
+      setBlogsLoading(false);
     }
   };
 
@@ -204,21 +216,21 @@ const AdminBlogs = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
   return (
-    <div className="min-h-screen bg-gray-100">
-      <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">
+    <div className="">
+      <div className="max-w-6xl">
+        <h1 className="text-3xl font-bold mb-3">
           {editingId ? "Update Blog" : "Create Blog"}
         </h1>
 
         {/* ================= Blog Form ================= */}
-        <div className="bg-white p-6 rounded shadow mb-12 grid gap-6">
+        <div className="bg-white p-2 rounded shadow mb-12 grid gap-3">
           <input
             type="text"
             name="title"
             placeholder="Blog Title"
             value={formData.title}
             onChange={handleChange}
-            className="border p-3 rounded"
+            className="border  border-gray-300 p-2 rounded"
           />
 
           <textarea
@@ -226,7 +238,7 @@ const AdminBlogs = () => {
             placeholder="Short Description"
             value={formData.short_description}
             onChange={handleChange}
-            className="border p-3 rounded"
+            className="border border-gray-300 p-2 rounded"
             rows="3"
           />
 
@@ -247,7 +259,7 @@ const AdminBlogs = () => {
             type="file"
             accept="image/*"
             onChange={(e) => setImageFile(e.target.files[0])}
-            className="border p-3 rounded"
+            className="border border-gray-300 p-2 mt-10 rounded"
           />
 
           <div className="flex gap-4">
@@ -278,27 +290,61 @@ const AdminBlogs = () => {
         </div>
 
         {/* ================= Blog List ================= */}
-        <div className="bg-white p-6 rounded shadow">
+        <div className="bg-white p-2 rounded shadow">
           <h2 className="text-2xl font-semibold mb-6">Uploaded Blogs</h2>
 
-          {blogs.length === 0 ? (
+          {blogsLoading ? (
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="bg-gray-200 text-left">
+                    <th className="p-3 border border-gray-300">Image</th>
+                    <th className="p-3 border border-gray-300">Title</th>
+                    <th className="p-3 border border-gray-300">Date</th>
+                    <th className="p-3 border border-gray-300 text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Array.from({ length: 4 }).map((_, index) => (
+                    <tr key={`blog-row-skeleton-${index}`}>
+                      <td className="border border-gray-300 p-3">
+                        <Skeleton className="h-16 w-20 bg-slate-200" />
+                      </td>
+                      <td className="border border-gray-300 p-3">
+                        <Skeleton className="h-5 w-3/4 bg-slate-200" />
+                      </td>
+                      <td className="border border-gray-300 p-3">
+                        <Skeleton className="h-4 w-24 bg-slate-200" />
+                      </td>
+                      <td className="border border-gray-300 p-3">
+                        <div className="flex justify-center gap-3">
+                          <Skeleton className="h-8 w-16 bg-slate-200" />
+                          <Skeleton className="h-8 w-16 bg-slate-200" />
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : blogs.length === 0 ? (
             <p className="text-gray-500">No blogs uploaded yet.</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
                 <thead>
                   <tr className="bg-gray-200 text-left">
-                    <th className="p-3 border">Image</th>
-                    <th className="p-3 border">Title</th>
-                    <th className="p-3 border">Date</th>
-                    <th className="p-3 border text-center">Actions</th>
+                    <th className="p-3 border border-gray-300">Image</th>
+                    <th className="p-3 border border-gray-300">Title</th>
+                    <th className="p-3 border border-gray-300">Date</th>
+                    <th className="p-3 border border-gray-300 text-center">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {blogs.map((blog) => (
                     <tr key={blog.id} className="hover:bg-gray-50">
                       {/* Image */}
-                      <td className="p-3 border">
+                      <td className=" border border-gray-300">
                         {blog.image ? (
                           <img
                             src={`${API_BASE}/${blog.image}`}
@@ -315,15 +361,15 @@ const AdminBlogs = () => {
                       </td>
 
                       {/* Title */}
-                      <td className="p-3 border font-medium">{blog.title}</td>
+                      <td className="p-3 border border-gray-300 font-medium">{blog.title}</td>
 
                       {/* Date */}
-                      <td className="p-3 border text-sm text-gray-500">
+                      <td className="p-3 border border-gray-300 text-sm text-gray-500">
                         {new Date(blog.created_at).toDateString()}
                       </td>
 
                       {/* Actions */}
-                      <td className="p-3 border text-center">
+                      <td className="p-3 border border-gray-300 text-center">
                         <div className="flex justify-center gap-3">
                           <button
                             onClick={() => handleEdit(blog)}

@@ -9,6 +9,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { useToast } from "@/components/providers/ToastProvider";
+import Skeleton from "@/components/ui/Skeleton";
 
 export default function MenuAdmin() {
   const [categories, setCategories] = useState([]);
@@ -16,6 +17,7 @@ export default function MenuAdmin() {
   const [items, setItems] = useState([]);
   const [newCategory, setNewCategory] = useState("");
   const [loading, setLoading] = useState(false);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
 
   const [form, setForm] = useState({
     name: "",
@@ -30,6 +32,7 @@ export default function MenuAdmin() {
 
 
   const fetchCategories = async () => {
+    setCategoriesLoading(true);
     try {
       const res = await fetch(`${API}/get_categories.php`);
       const data = await res.json();
@@ -40,6 +43,8 @@ export default function MenuAdmin() {
     } catch (error) {
       console.error("Failed to fetch categories", error);
       showToast("Failed to fetch categories.", "error");
+    } finally {
+      setCategoriesLoading(false);
     }
   };
 
@@ -217,12 +222,22 @@ export default function MenuAdmin() {
             </div>
 
             <div className="space-y-1">
-              {categories.length === 0 && (
+              {categoriesLoading &&
+                Array.from({ length: 5 }).map((_, index) => (
+                  <div
+                    key={`category-skeleton-${index}`}
+                    className="px-2 py-1"
+                  >
+                    <Skeleton className="h-8 w-full bg-slate-200" />
+                  </div>
+                ))}
+
+              {!categoriesLoading && categories.length === 0 && (
                 <div className="text-center py-8 text-slate-400 italic">
                   No categories created
                 </div>
               )}
-              {categories.map((cat) => (
+              {!categoriesLoading && categories.map((cat) => (
                 <div
                   key={cat.id}
                   onClick={() => handleCategoryClick(cat.id)}
@@ -320,6 +335,21 @@ export default function MenuAdmin() {
                 </div>
 
                 <div className="divide-y divide-slate-100">
+                  {loading &&
+                    Array.from({ length: 4 }).map((_, index) => (
+                      <div key={`item-skeleton-${index}`} className="p-6 flex justify-between items-center">
+                        <div className="flex gap-4 items-center w-full">
+                          <Skeleton className="h-20 w-20 bg-slate-200" />
+                          <div className="flex-1">
+                            <Skeleton className="mb-2 h-5 w-1/3 bg-slate-200" />
+                            <Skeleton className="mb-2 h-4 w-2/3 bg-slate-200" />
+                            <Skeleton className="h-4 w-24 bg-slate-200" />
+                          </div>
+                        </div>
+                        <Skeleton className="h-8 w-8 bg-slate-200" />
+                      </div>
+                    ))}
+
                   {items.length === 0 && !loading && (
                     <div className="p-12 text-center text-slate-400">
                       This category is currently empty. Add your first item

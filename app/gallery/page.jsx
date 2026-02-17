@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { X, ZoomIn } from "lucide-react";
+import Skeleton from "@/components/ui/Skeleton";
 
 const Navbar = dynamic(() => import("../../components/layout/navbar/Navbar"), {
   loading: () => <div className="h-24" />,
@@ -16,11 +17,40 @@ const Footer = dynamic(() => import("../../components/layout/footer/Footer"), {
 // const API = `${process.env.NEXT_PUBLIC_API_BASE || "http://localhost/himalayanthakali_backend"}/gallery`;
 const API = `${process.env.NEXT_PUBLIC_API_BASE || "https://api.himalayanthakali.com/himalayanthakali_backend"}/gallery`;
 
+function GalleryFiltersSkeleton() {
+  return (
+    <div className="mb-16 flex flex-wrap justify-center gap-4">
+      {Array.from({ length: 5 }).map((_, index) => (
+        <Skeleton
+          key={`filter-skeleton-${index}`}
+          className="h-11 w-28 rounded bg-white/10"
+        />
+      ))}
+    </div>
+  );
+}
+
+function GalleryGridSkeleton() {
+  return (
+    <div className="grid grid-cols-1 gap-8 sm:p-10 md:grid-cols-2 lg:grid-cols-6">
+      {Array.from({ length: 6 }).map((_, index) => (
+        <Skeleton
+          key={`gallery-skeleton-${index}`}
+          className={`w-full rounded-lg bg-white/10 ${
+            index < 2 ? "h-87.5 md:col-span-1 lg:col-span-3" : "h-62.5 md:col-span-1 lg:col-span-2"
+          }`}
+        />
+      ))}
+    </div>
+  );
+}
+
 export default function ThakaliGallery() {
   const [activeFilter, setActiveFilter] = useState("All");
   const [galleryImages, setGalleryImages] = useState([]);
   const [filters, setFilters] = useState([]);
   const [selectedImg, setSelectedImg] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     fetch(`${API}/get_gallery.php`)
@@ -31,6 +61,14 @@ export default function ThakaliGallery() {
           const uniqueCategories = ["All", ...new Set(data.data.map((item) => item.category_name))];
           setFilters(uniqueCategories);
         }
+      })
+      .catch((error) => {
+        console.error("Failed to fetch gallery:", error);
+        setGalleryImages([]);
+        setFilters(["All"]);
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   }, []);
 
@@ -85,55 +123,67 @@ export default function ThakaliGallery() {
             </p>
           </header>
 
-          <div className="animate-fadeIn mb-16 flex flex-wrap justify-center gap-4">
-            {filters.map((filter, index) => (
-              <button
-                key={`${filter}-${index}`}
-                type="button"
-                onClick={() => setActiveFilter(filter)}
-                className={`group relative overflow-hidden rounded px-8 py-3 text-sm font-medium capitalize transition-all duration-200 ${
-                  activeFilter === filter
-                    ? "bg-[#D97634] text-white"
-                    : "border border-[#D97634] bg-transparent text-[#D97634]"
-                }`}
-              >
-                <span className="relative z-10">{filter}</span>
-                <span className="absolute inset-0 -translate-x-full bg-white/10 transition-transform duration-200 group-hover:translate-x-full" />
-              </button>
-            ))}
-          </div>
+          {isLoading ? (
+            <GalleryFiltersSkeleton />
+          ) : (
+            <div className="animate-fadeIn mb-16 flex flex-wrap justify-center gap-4">
+              {filters.map((filter, index) => (
+                <button
+                  key={`${filter}-${index}`}
+                  type="button"
+                  onClick={() => setActiveFilter(filter)}
+                  className={`group relative overflow-hidden rounded px-8 py-3 text-sm font-medium capitalize transition-all duration-200 ${
+                    activeFilter === filter
+                      ? "bg-[#D97634] text-white"
+                      : "border border-[#D97634] bg-transparent text-[#D97634]"
+                  }`}
+                >
+                  <span className="relative z-10">{filter}</span>
+                  <span className="absolute inset-0 -translate-x-full bg-white/10 transition-transform duration-200 group-hover:translate-x-full" />
+                </button>
+              ))}
+            </div>
+          )}
 
           <div className="relative">
             <div className="absolute hidden h-50 w-50 border-t-2 border-l-2 border-[#E9842C] sm:flex" />
             <div className="absolute bottom-0 right-0 hidden h-50 w-50 border-r-2 border-b-2 border-[#E9842C] sm:flex" />
 
-            <div className="grid grid-cols-1 gap-8 sm:p-10 md:grid-cols-2 lg:grid-cols-6">
-              {filteredImages.map((image, index) => (
-                <button
-                  key={image.id}
-                  type="button"
-                  onClick={() => setSelectedImg(image)}
-                  style={{ animationDelay: `${index * 0.05}s` }}
-                  aria-label={`Open image preview: ${image.alt_text || "Gallery image"}`}
-                  className={`gallery-item group relative cursor-pointer overflow-hidden rounded-lg transition-transform duration-300 hover:-translate-y-1 animate-scaleIn ${
-                    index < 2 ? "md:col-span-1 lg:col-span-3" : "md:col-span-1 lg:col-span-2"
-                  }`}
-                >
-                  <div className={`relative w-full ${image.span === "large" ? "h-87.5" : "h-62.5"}`}>
-                    <Image
-                      src={`${API}/${image.image_path}`}
-                      alt={image.alt_text || "Gallery image"}
-                      fill
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      className="absolute inset-0 h-full w-full object-contain transition-transform duration-500 group-hover:scale-105"
-                    />
-                  </div>
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-                    <ZoomIn className="h-8 w-8 scale-75 text-white transition-transform duration-200 group-hover:scale-100" aria-hidden="true" />
-                  </div>
-                </button>
-              ))}
-            </div>
+            {isLoading ? (
+              <GalleryGridSkeleton />
+            ) : (
+              <div className="grid grid-cols-1 gap-8 sm:p-10 md:grid-cols-2 lg:grid-cols-6">
+                {filteredImages.map((image, index) => (
+                  <button
+                    key={image.id}
+                    type="button"
+                    onClick={() => setSelectedImg(image)}
+                    style={{ animationDelay: `${index * 0.05}s` }}
+                    aria-label={`Open image preview: ${image.alt_text || "Gallery image"}`}
+                    className={`gallery-item group relative cursor-pointer overflow-hidden rounded-lg transition-transform duration-300 hover:-translate-y-1 animate-scaleIn ${
+                      index < 2 ? "md:col-span-1 lg:col-span-3" : "md:col-span-1 lg:col-span-2"
+                    }`}
+                  >
+                    <div className={`relative w-full ${image.span === "large" ? "h-87.5" : "h-62.5"}`}>
+                      <Image
+                        src={`${API}/${image.image_path}`}
+                        alt={image.alt_text || "Gallery image"}
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        className="absolute inset-0 h-full w-full object-contain transition-transform duration-500 group-hover:scale-105"
+                      />
+                    </div>
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                      <ZoomIn className="h-8 w-8 scale-75 text-white transition-transform duration-200 group-hover:scale-100" aria-hidden="true" />
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {!isLoading && filteredImages.length === 0 && (
+              <p className="py-10 text-center text-gray-400">No images found.</p>
+            )}
           </div>
         </div>
 

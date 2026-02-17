@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { Plus, Trash2, FolderPlus, Image as ImageIcon, X, Edit3, Loader2 } from "lucide-react";
 import { useToast } from "@/components/providers/ToastProvider";
+import Skeleton from "@/components/ui/Skeleton";
 
 export default function GalleryAdmin() {
   // const API = "http://localhost/himalayanthakali_backend/gallery";
@@ -16,6 +17,8 @@ export default function GalleryAdmin() {
   const [gallery, setGallery] = useState([]);
   const [newCategory, setNewCategory] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isCategoriesLoading, setIsCategoriesLoading] = useState(true);
+  const [isGalleryLoading, setIsGalleryLoading] = useState(false);
   const [form, setForm] = useState({
     id: null,
     alt_text: "",
@@ -28,6 +31,7 @@ export default function GalleryAdmin() {
   // CATEGORY LOGIC
   // ——————————————————————————————————————————————————————————————————————————
   const fetchCategories = async () => {
+    setIsCategoriesLoading(true);
     try {
       const res = await fetch(`${API}/get_categories.php`);
       const data = await res.json();
@@ -35,6 +39,8 @@ export default function GalleryAdmin() {
     } catch (error) {
       console.error("Failed to fetch categories:", error);
       setCategories([]);
+    } finally {
+      setIsCategoriesLoading(false);
     }
   };
 
@@ -94,6 +100,7 @@ export default function GalleryAdmin() {
   };
 
   const handleCategoryClick = async (id) => {
+    setIsGalleryLoading(true);
     try {
       setActiveCategory(id);
       const res = await fetch(`${API}/get_gallery.php?category_id=${id}`);
@@ -103,6 +110,8 @@ export default function GalleryAdmin() {
       console.error("Failed to fetch gallery:", error);
       setGallery([]);
       showToast("Failed to load gallery.", "error");
+    } finally {
+      setIsGalleryLoading(false);
     }
   };
 
@@ -223,30 +232,36 @@ export default function GalleryAdmin() {
           </div>
 
           {/* Categories List */}
-          {categories.map((cat) => (
-            <div
-              key={cat.id}
-              onClick={() => handleCategoryClick(cat.id)}
-              className={`shrink-0 flex items-center justify-between px-4 py-2 rounded-full md:rounded-lg cursor-pointer text-sm font-medium transition-all ${
-                activeCategory === cat.id
-                  ? "bg-[#E9842C] text-white shadow-md shadow-orange-200"
-                  : "bg-zinc-100 md:bg-transparent text-zinc-600 hover:bg-zinc-200"
-              }`}
-            >
-              <span className="whitespace-nowrap">{cat.name}</span>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  deleteCategory(cat.id);
-                }}
-                className={`ml-2 p-1 rounded-md transition-colors ${
-                  activeCategory === cat.id ? "hover:bg-orange-600" : "hover:text-red-500"
-                }`}
-              >
-                <Trash2 size={14} />
-              </button>
-            </div>
-          ))}
+          {isCategoriesLoading
+            ? Array.from({ length: 5 }).map((_, index) => (
+                <div key={`gallery-category-skeleton-${index}`} className="shrink-0 w-32 md:w-full px-2">
+                  <Skeleton className="h-9 w-full bg-slate-200" />
+                </div>
+              ))
+            : categories.map((cat) => (
+                <div
+                  key={cat.id}
+                  onClick={() => handleCategoryClick(cat.id)}
+                  className={`shrink-0 flex items-center justify-between px-4 py-2 rounded-full md:rounded-lg cursor-pointer text-sm font-medium transition-all ${
+                    activeCategory === cat.id
+                      ? "bg-[#E9842C] text-white shadow-md shadow-orange-200"
+                      : "bg-zinc-100 md:bg-transparent text-zinc-600 hover:bg-zinc-200"
+                  }`}
+                >
+                  <span className="whitespace-nowrap">{cat.name}</span>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deleteCategory(cat.id);
+                    }}
+                    className={`ml-2 p-1 rounded-md transition-colors ${
+                      activeCategory === cat.id ? "hover:bg-orange-600" : "hover:text-red-500"
+                    }`}
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              ))}
         </div>
       </aside>
 
@@ -318,41 +333,47 @@ export default function GalleryAdmin() {
 
             {/* IMAGE GRID */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {gallery.map((img) => (
-                <div key={img.id} className="relative bg-white border border-zinc-200 rounded-2xl overflow-hidden group shadow-sm">
-                  <img
-                    src={`${API}/${img.image_path}`}
-                    className="h-56 w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    alt={img.alt_text}
-                    loading="lazy"
-                    decoding="async"
-                  />
-                  
-                  {/* Persistent Mobile-Friendly Actions */}
-                  <div className="absolute bottom-0 inset-x-0 p-3 bg-linear-to-t from-black/90 via-black/40 to-transparent flex items-center justify-between">
-                    <span className="text-white text-xs font-medium truncate pr-4">
-                      {img.alt_text || "Untitled"}
-                    </span>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleEditImage(img)}
-                        className="bg-white/20 hover:bg-white text-white hover:text-zinc-900 p-2 rounded-lg backdrop-blur-md transition-colors"
-                      >
-                        <Edit3 size={16} />
-                      </button>
-                      <button
-                        onClick={() => deleteImage(img.id)}
-                        className="bg-red-500/80 hover:bg-red-600 text-white p-2 rounded-lg transition-colors"
-                      >
-                        <Trash2 size={16} />
-                      </button>
+              {isGalleryLoading
+                ? Array.from({ length: 6 }).map((_, index) => (
+                    <div key={`gallery-item-skeleton-${index}`} className="bg-white border border-zinc-200 rounded-2xl p-2">
+                      <Skeleton className="h-56 w-full bg-slate-200" />
                     </div>
-                  </div>
-                </div>
-              ))}
+                  ))
+                : gallery.map((img) => (
+                    <div key={img.id} className="relative bg-white border border-zinc-200 rounded-2xl overflow-hidden group shadow-sm">
+                      <img
+                        src={`${API}/${img.image_path}`}
+                        className="h-56 w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        alt={img.alt_text}
+                        loading="lazy"
+                        decoding="async"
+                      />
+
+                      {/* Persistent Mobile-Friendly Actions */}
+                      <div className="absolute bottom-0 inset-x-0 p-3 bg-linear-to-t from-black/90 via-black/40 to-transparent flex items-center justify-between">
+                        <span className="text-white text-xs font-medium truncate pr-4">
+                          {img.alt_text || "Untitled"}
+                        </span>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleEditImage(img)}
+                            className="bg-white/20 hover:bg-white text-white hover:text-zinc-900 p-2 rounded-lg backdrop-blur-md transition-colors"
+                          >
+                            <Edit3 size={16} />
+                          </button>
+                          <button
+                            onClick={() => deleteImage(img.id)}
+                            className="bg-red-500/80 hover:bg-red-600 text-white p-2 rounded-lg transition-colors"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
             </div>
 
-            {gallery.length === 0 && (
+            {!isGalleryLoading && gallery.length === 0 && (
               <div className="text-center py-20 bg-zinc-100 rounded-2xl border-2 border-dashed border-zinc-200 text-zinc-400">
                 No images found in this category.
               </div>
