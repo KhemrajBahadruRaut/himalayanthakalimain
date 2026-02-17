@@ -1,23 +1,34 @@
 "use client";
-import { useEffect, useState } from "react";
+
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  Plus,
-  Trash2,
-  Utensils,
   FolderPlus,
   Image as ImageIcon,
   Loader2,
+  Plus,
+  Search,
+  Trash2,
+  Utensils,
 } from "lucide-react";
 import { useToast } from "@/components/providers/ToastProvider";
 import Skeleton from "@/components/ui/Skeleton";
+
+const API = "https://api.himalayanthakali.com/himalayanthakali_backend/menu";
+
+function toCurrency(value) {
+  const amount = Number(value);
+  if (Number.isNaN(amount)) return `Rs. ${value || "-"}`;
+  return `Rs. ${amount.toLocaleString()}`;
+}
 
 export default function MenuAdmin() {
   const [categories, setCategories] = useState([]);
   const [activeCategory, setActiveCategory] = useState(null);
   const [items, setItems] = useState([]);
   const [newCategory, setNewCategory] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [categoriesLoading, setCategoriesLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isItemsLoading, setIsItemsLoading] = useState(false);
+  const [isCategoriesLoading, setIsCategoriesLoading] = useState(true);
 
   const [form, setForm] = useState({
     name: "",
@@ -27,61 +38,86 @@ export default function MenuAdmin() {
   });
   const { showToast, showConfirm } = useToast();
 
-  // const API = "http://localhost/himalayanthakali_backend/menu";
-    const API = "https://api.himalayanthakali.com/himalayanthakali_backend/menu";
-
-
-  const fetchCategories = async () => {
-    setCategoriesLoading(true);
-    try {
-      const res = await fetch(`${API}/get_categories.php`);
-      const data = await res.json();
-      setCategories(data);
-      if (!activeCategory && data.length) {
-        handleCategoryClick(data[0].id);
+  const fetchItems = useCallback(
+    async (categoryId) => {
+      if (!categoryId) {
+        setItems([]);
+        return;
       }
-    } catch (error) {
-      console.error("Failed to fetch categories", error);
-      showToast("Failed to fetch categories.", "error");
-    } finally {
-      setCategoriesLoading(false);
-    }
-  };
 
-  const handleCategoryClick = (id) => {
-    setActiveCategory(id);
-    fetchItems(id);
-  };
+      setIsItemsLoading(true);
+      try {
+        const res = await fetch(`${API}/get_items.php?category_id=${categoryId}`);
+        const data = await res.json();
+        setItems(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error("Failed to fetch items", error);
+        setItems([]);
+        showToast("Failed to fetch items.", "error");
+      } finally {
+        setIsItemsLoading(false);
+      }
+    },
+    [showToast]
+  );
 
-  const fetchItems = async (id) => {
-    setLoading(true);
-    try {
-      const res = await fetch(`${API}/get_items.php?category_id=${id}`);
-      const data = await res.json();
-      setItems(data);
-    } catch (error) {
-      console.error("Failed to fetch items", error);
-      setItems([]);
-      showToast("Failed to fetch items.", "error");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const fetchCategories = useCallback(
+    async (preferredCategory = null) => {
+      setIsCategoriesLoading(true);
+      try {
+        const res = await fetch(`${API}/get_categories.php`);
+        const data = await res.json();
+        const safeCategories = Array.isArray(data) ? data : [];
+        setCategories(safeCategories);
+
+        if (safeCategories.length === 0) {
+          setActiveCategory(null);
+          setItems([]);
+          return;
+        }
+
+        const preferredExists =
+          preferredCategory !== null &&
+          safeCategories.some(
+            (category) => String(category.id) === String(preferredCategory)
+          );
+        const nextCategory = preferredExists
+          ? preferredCategory
+          : safeCategories[0].id;
+
+        setActiveCategory(nextCategory);
+        await fetchItems(nextCategory);
+      } catch (error) {
+        console.error("Failed to fetch categories", error);
+        setCategories([]);
+        showToast("Failed to fetch categories.", "error");
+      } finally {
+        setIsCategoriesLoading(false);
+      }
+    },
+    [fetchItems, showToast]
+  );
 
   useEffect(() => {
     fetchCategories();
-  }, []);
+  }, [fetchCategories]);
+
+  const handleCategoryClick = async (id) => {
+    setActiveCategory(id);
+    await fetchItems(id);
+  };
 
   const addCategory = async () => {
-    if (!newCategory) {
+    if (!newCategory.trim()) {
       showToast("Enter a category name first.", "warning");
       return;
     }
+
     try {
       const res = await fetch(`${API}/add_category.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: newCategory }),
+        body: JSON.stringify({ name: newCategory.trim() }),
       });
       const data = await res.json().catch(() => null);
 
@@ -90,8 +126,9 @@ export default function MenuAdmin() {
         return;
       }
 
+      const currentCategory = activeCategory;
       setNewCategory("");
-      await fetchCategories();
+      await fetchCategories(currentCategory);
       showToast(data?.message || "Category added.", "success");
     } catch (error) {
       console.error("Failed to add category", error);
@@ -115,8 +152,10 @@ export default function MenuAdmin() {
         return;
       }
 
-      await fetchCategories();
-      setItems([]);
+      const nextPreferredCategory =
+        String(activeCategory) === String(id) ? null : activeCategory;
+
+      await fetchCategories(nextPreferredCategory);
       showToast(data?.message || "Category deleted.", "success");
     } catch (error) {
       console.error("Failed to delete category", error);
@@ -125,15 +164,15 @@ export default function MenuAdmin() {
   };
 
   const addItem = async () => {
-    if (!activeCategory || !form.name || !form.price) {
+    if (!activeCategory || !form.name.trim() || !form.price) {
       showToast("Category, name and price are required.", "warning");
       return;
     }
 
     const fd = new FormData();
     fd.append("category_id", activeCategory);
-    fd.append("name", form.name);
-    fd.append("description", form.description);
+    fd.append("name", form.name.trim());
+    fd.append("description", form.description.trim());
     fd.append("price", form.price);
     if (form.image) fd.append("image", form.image);
 
@@ -182,249 +221,282 @@ export default function MenuAdmin() {
     }
   };
 
-  return (
-    <div className=" max-w-7xl mx-auto bg-gray-50 min-h-screen font-sans text-slate-900">
-      {/* Header */}
-      <header className="flex items-center justify-between mb-5">
-        <div>
-          <h1 className="text-2xl font-extrabold text-slate-800 tracking-tight flex items-center gap-3">
-            <Utensils className="text-[#E9842C]" size={20} />
-            Menu <span className="text-[#E9842C]">Management</span>
-          </h1>
-          <p className="text-slate-500 mt-1">
-            Organize your restaurant offerings and pricing.
-          </p>
-        </div>
-      </header>
+  const filteredItems = useMemo(() => {
+    const query = searchTerm.trim().toLowerCase();
+    if (!query) return items;
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-2">
-        {/* Left Column: Categories */}
-        <div className="lg:col-span-3 space-y-1">
-          <div className="bg-white shadow-sm rounded p-3 border border-slate-200">
-            <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
-              <FolderPlus size={20} className="text-[#E9842C]" />
+    return items.filter((item) => {
+      const haystack = [item.name, item.description, item.price]
+        .join(" ")
+        .toLowerCase();
+      return haystack.includes(query);
+    });
+  }, [items, searchTerm]);
+
+  return (
+    <div className="mx-auto max-w-7xl space-y-6">
+      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900">
+              <Utensils className="h-6 w-6 text-[#E9842C]" />
+              Menu Management
+            </h1>
+            <p className="mt-1 text-sm text-slate-500">
+              Organize categories, upload menu items, and manage pricing.
+            </p>
+          </div>
+          {isItemsLoading && (
+            <span className="inline-flex items-center gap-2 rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-600">
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              Loading items...
+            </span>
+          )}
+        </div>
+
+        <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+            <p className="text-xs font-semibold uppercase text-slate-500">Categories</p>
+            <p className="mt-2 text-2xl font-bold text-slate-900">{categories.length}</p>
+          </div>
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+            <p className="text-xs font-semibold uppercase text-slate-500">Items In Category</p>
+            <p className="mt-2 text-2xl font-bold text-slate-900">{items.length}</p>
+          </div>
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+            <p className="text-xs font-semibold uppercase text-slate-500">Filtered Results</p>
+            <p className="mt-2 text-2xl font-bold text-slate-900">{filteredItems.length}</p>
+          </div>
+        </div>
+      </section>
+
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-12">
+        <aside className="xl:col-span-4">
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <h2 className="mb-4 flex items-center gap-2 text-lg font-bold text-slate-900">
+              <FolderPlus className="h-5 w-5 text-[#E9842C]" />
               Categories
             </h2>
 
-            <div className="flex gap-2 mb-6">
+            <div className="mb-4 flex gap-2">
               <input
                 value={newCategory}
                 onChange={(e) => setNewCategory(e.target.value)}
-                placeholder="Ex: Main Course"
-                className="flex-1 border border-slate-200 focus:ring-2 focus:ring-[#E9842C]/20 focus:border-[#E9842C] p-2.5 rounded-xl outline-none transition-all"
+                placeholder="Add category"
+                className="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm outline-none transition focus:border-[#E9842C] focus:bg-white"
               />
               <button
                 onClick={addCategory}
-                className="bg-[#E9842C] hover:bg-[#cf7320] text-white p-2.5 rounded-xl transition-all shadow-md active:scale-95"
+                className="rounded-xl bg-[#E9842C] px-3 text-white transition hover:bg-[#cf7320]"
               >
-                <Plus size={24} />
+                <Plus size={18} />
               </button>
             </div>
 
-            <div className="space-y-1">
-              {categoriesLoading &&
-                Array.from({ length: 5 }).map((_, index) => (
-                  <div
-                    key={`category-skeleton-${index}`}
-                    className="px-2 py-1"
-                  >
-                    <Skeleton className="h-8 w-full bg-slate-200" />
-                  </div>
+            <div className="space-y-2">
+              {isCategoriesLoading &&
+                Array.from({ length: 6 }).map((_, index) => (
+                  <Skeleton key={`category-skeleton-${index}`} className="h-10 w-full" />
                 ))}
 
-              {!categoriesLoading && categories.length === 0 && (
-                <div className="text-center py-8 text-slate-400 italic">
-                  No categories created
+              {!isCategoriesLoading && categories.length === 0 && (
+                <div className="rounded-xl border border-dashed border-slate-300 py-8 text-center text-sm text-slate-500">
+                  No categories created yet.
                 </div>
               )}
-              {!categoriesLoading && categories.map((cat) => (
-                <div
-                  key={cat.id}
-                  onClick={() => handleCategoryClick(cat.id)}
-                  className={`group flex justify-between items-center px-2 py-1 rounded-lg cursor-pointer transition-all duration-200 ${
-                    activeCategory === cat.id
-                      ? "bg-[#E9842C] text-white shadow-lg"
-                      : "hover:bg-orange-50 text-slate-600"
-                  }`}
-                >
-                  <span className="font-medium">{cat.name}</span>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      deleteCategory(cat.id);
-                    }}
-                    className={`p-1 rounded-lg transition-colors ${
-                      activeCategory === cat.id
-                        ? "hover:bg-white/20 text-white"
-                        : "text-slate-300 hover:text-red-500 hover:bg-red-50"
-                    }`}
-                  >
-                    <Trash2 size={18} />
-                  </button>
-                </div>
-              ))}
+
+              {!isCategoriesLoading &&
+                categories.map((category) => {
+                  const isActive =
+                    activeCategory !== null &&
+                    String(activeCategory) === String(category.id);
+
+                  return (
+                    <button
+                      key={category.id}
+                      onClick={() => handleCategoryClick(category.id)}
+                      className={`flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition ${
+                        isActive
+                          ? "bg-[#E9842C] text-white"
+                          : "bg-slate-50 text-slate-700 hover:bg-orange-50"
+                      }`}
+                    >
+                      <span className="truncate pr-2">{category.name}</span>
+                      <span
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deleteCategory(category.id);
+                        }}
+                        className={`inline-flex rounded-lg p-1 ${
+                          isActive ? "hover:bg-white/20" : "hover:bg-red-100"
+                        }`}
+                      >
+                        <Trash2
+                          className={`h-4 w-4 ${
+                            isActive ? "text-white" : "text-red-500"
+                          }`}
+                        />
+                      </span>
+                    </button>
+                  );
+                })}
             </div>
           </div>
-        </div>
+        </aside>
 
-        {/* Right Column: Items */}
-        <div className="lg:col-span-9">
+        <main className="xl:col-span-8 space-y-6">
           {activeCategory ? (
-            <div className="space-y-6">
-              {/* Form Card */}
-              <div className="bg-white shadow-sm rounded p-6 border border-slate-200">
-                <h2 className="text-lg font-bold mb-4">Add New Item</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <>
+              <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <h2 className="mb-4 text-lg font-bold text-slate-900">Add New Menu Item</h2>
+
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <input
-                    placeholder="Item Name (e.g. Thakali Thali)"
+                    placeholder="Item name"
                     value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    className="border border-slate-200 focus:ring-2 focus:ring-[#E9842C]/20 focus:border-[#E9842C] p-2.5 rounded-xl outline-none"
+                    className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm outline-none transition focus:border-[#E9842C] focus:bg-white"
                   />
                   <input
-                    placeholder="Price (Rs.)"
+                    placeholder="Price"
                     type="number"
                     value={form.price}
-                    onChange={(e) =>
-                      setForm({ ...form, price: e.target.value })
-                    }
-                    className="border border-slate-200 focus:ring-2 focus:ring-[#E9842C]/20 focus:border-[#E9842C] p-2.5 rounded-xl outline-none"
+                    onChange={(e) => setForm({ ...form, price: e.target.value })}
+                    className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm outline-none transition focus:border-[#E9842C] focus:bg-white"
                   />
-                  <div className="md:col-span-2">
-                    <textarea
-                      placeholder="Item Description"
-                      value={form.description}
-                      onChange={(e) =>
-                        setForm({ ...form, description: e.target.value })
-                      }
-                      className="w-full border border-slate-200 focus:ring-2 focus:ring-[#E9842C]/20 focus:border-[#E9842C] p-2.5 rounded-xl outline-none h-20"
-                    />
-                  </div>
-                  <div className="md:col-span-2 flex items-center gap-4 border-2 border-dashed border-slate-100 p-4 rounded-xl">
-                    <ImageIcon className="text-slate-400" />
+                  <textarea
+                    placeholder="Description"
+                    value={form.description}
+                    onChange={(e) => setForm({ ...form, description: e.target.value })}
+                    className="md:col-span-2 h-24 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm outline-none transition focus:border-[#E9842C] focus:bg-white"
+                  />
+                  <div className="md:col-span-2 flex items-center gap-3 rounded-xl border border-dashed border-slate-300 bg-slate-50 p-3">
+                    <ImageIcon className="h-4 w-4 text-slate-400" />
                     <input
                       type="file"
                       accept="image/*"
                       onChange={(e) =>
-                        setForm({ ...form, image: e.target.files[0] })
+                        setForm({ ...form, image: e.target.files?.[0] || null })
                       }
-                      className="text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-[#E9842C] hover:file:bg-orange-100"
+                      className="w-full text-sm text-slate-500 file:mr-4 file:rounded-lg file:border-0 file:bg-slate-900 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-white"
                     />
                   </div>
                   <button
                     onClick={addItem}
-                    className="md:col-span-2 bg-slate-900 hover:bg-black text-white py-3 rounded-xl font-bold transition shadow-lg active:transform active:scale-[0.99]"
+                    className="md:col-span-2 rounded-xl bg-slate-900 py-2.5 text-sm font-semibold text-white transition hover:bg-black"
                   >
-                    Add Item to Menu
+                    Add Item
                   </button>
                 </div>
-              </div>
+              </section>
 
-              {/* Items List */}
-              <div className="bg-white shadow-sm rounded overflow-hidden border border-slate-200">
-                <div className="p-6 border-b border-slate-100 flex justify-between items-center">
-                  <h2 className="font-bold text-xl text-slate-800">
-                    Menu Items
-                  </h2>
-                  {loading && (
-                    <Loader2
-                      className="animate-spin text-[#E9842C]"
-                      size={20}
+              <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                  <h2 className="text-lg font-bold text-slate-900">Menu Items</h2>
+                  <div className="relative w-full md:w-80">
+                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                    <input
+                      type="text"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      placeholder="Search item name or description"
+                      className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-9 pr-3 text-sm outline-none transition focus:border-[#E9842C] focus:bg-white"
                     />
-                  )}
+                  </div>
                 </div>
 
-                <div className="divide-y divide-slate-100">
-                  {loading &&
+                <div className="space-y-3">
+                  {isItemsLoading &&
                     Array.from({ length: 4 }).map((_, index) => (
-                      <div key={`item-skeleton-${index}`} className="p-6 flex justify-between items-center">
-                        <div className="flex gap-4 items-center w-full">
-                          <Skeleton className="h-20 w-20 bg-slate-200" />
-                          <div className="flex-1">
-                            <Skeleton className="mb-2 h-5 w-1/3 bg-slate-200" />
-                            <Skeleton className="mb-2 h-4 w-2/3 bg-slate-200" />
-                            <Skeleton className="h-4 w-24 bg-slate-200" />
+                      <div
+                        key={`item-skeleton-${index}`}
+                        className="flex items-center justify-between rounded-xl border border-slate-200 p-3"
+                      >
+                        <div className="flex items-center gap-3">
+                          <Skeleton className="h-14 w-16 rounded-lg" />
+                          <div>
+                            <Skeleton className="mb-2 h-4 w-40" />
+                            <Skeleton className="h-3 w-24" />
                           </div>
                         </div>
-                        <Skeleton className="h-8 w-8 bg-slate-200" />
+                        <Skeleton className="h-8 w-16" />
                       </div>
                     ))}
 
-                  {items.length === 0 && !loading && (
-                    <div className="p-12 text-center text-slate-400">
-                      This category is currently empty. Add your first item
-                      above!
+                  {!isItemsLoading && filteredItems.length === 0 && (
+                    <div className="rounded-xl border border-dashed border-slate-300 py-12 text-center text-sm text-slate-500">
+                      {items.length === 0
+                        ? "This category has no menu items yet."
+                        : "No menu items match your search."}
                     </div>
                   )}
-                  {items.map((item) => (
-                    <div
-                      key={item.id}
-                      className="p-6 flex justify-between items-center hover:bg-slate-50 transition-colors"
-                    >
-                      <div className="flex gap-4 items-center">
-                        {/* Image Container */}
-                       <div className="h-20 w-20 rounded-lg bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-200">
-  {item.image_url ? (
-    <img
-      src={
-        item.image_url.startsWith("http")
-          ? item.image_url
-          : `https://api.himalayanthakali.com/${item.image_url.replace(/^\/+/, "")}`
-      }
-      alt={item.name || "Image"}
-      className="h-full w-full object-cover"
-      loading="lazy"
-      decoding="async"
-      onError={(e) => {
-        e.currentTarget.src =
-          "https://via.placeholder.com/80?text=No+Image";
-      }}
-    />
-  ) : (
-    <Utensils className="text-slate-300" size={24} />
-  )}
-</div>
 
-
-                        <div>
-                          <h3 className="font-bold text-slate-800 uppercase tracking-wide">
-                            {item.name}
-                          </h3>
-                          <p className="text-slate-500 text-sm max-w-md line-clamp-1">
-                            {item.description}
-                          </p>
-                          <p className="text-[#E9842C] font-bold mt-1">
-                            Rs. {item.price}
-                          </p>
-                        </div>
-                      </div>
-
-                      <button
-                        onClick={() => deleteItem(item.id)}
-                        className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                  {!isItemsLoading &&
+                    filteredItems.map((item) => (
+                      <div
+                        key={item.id}
+                        className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 p-3 hover:bg-slate-50/70"
                       >
-                        <Trash2 size={20} />
-                      </button>
-                    </div>
-                  ))}
+                        <div className="flex min-w-0 items-center gap-3">
+                          <div className="flex h-14 w-16 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-slate-100">
+                            {item.image_url ? (
+                              /* eslint-disable-next-line @next/next/no-img-element */
+                              <img
+                                src={
+                                  item.image_url.startsWith("http")
+                                    ? item.image_url
+                                    : `https://api.himalayanthakali.com/${item.image_url.replace(
+                                        /^\/+/,
+                                        ""
+                                      )}`
+                                }
+                                alt={item.name || "Menu item"}
+                                className="h-full w-full object-cover"
+                                loading="lazy"
+                                decoding="async"
+                              />
+                            ) : (
+                              <Utensils className="h-4 w-4 text-slate-400" />
+                            )}
+                          </div>
+
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-semibold text-slate-800">
+                              {item.name}
+                            </p>
+                            <p className="truncate text-xs text-slate-500">
+                              {item.description || "No description"}
+                            </p>
+                            <p className="mt-1 text-sm font-bold text-[#E9842C]">
+                              {toCurrency(item.price)}
+                            </p>
+                          </div>
+                        </div>
+
+                        <button
+                          onClick={() => deleteItem(item.id)}
+                          className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-red-700"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                          Delete
+                        </button>
+                      </div>
+                    ))}
                 </div>
-              </div>
-            </div>
+              </section>
+            </>
           ) : (
-            <div className="h-full flex flex-col items-center justify-center bg-white border-2 border-dashed border-slate-200 rounded p-12 text-center">
-              <div className="bg-orange-50 p-6 rounded-full mb-4">
-                <Utensils size={48} className="text-[#E9842C]" />
+            <div className="rounded-2xl border-2 border-dashed border-slate-300 bg-white p-16 text-center">
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-orange-100">
+                <Utensils className="h-6 w-6 text-[#E9842C]" />
               </div>
-              <h3 className="text-xl font-bold text-slate-800">
-                No Category Selected
-              </h3>
-              <p className="text-slate-500 mt-2">
-                Select or create a category on the left to manage its menu
-                items.
+              <h3 className="text-lg font-bold text-slate-800">No Category Selected</h3>
+              <p className="mt-2 text-sm text-slate-500">
+                Create or choose a category from the left to manage menu items.
               </p>
             </div>
           )}
-        </div>
+        </main>
       </div>
     </div>
   );

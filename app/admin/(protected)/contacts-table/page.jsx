@@ -1,38 +1,113 @@
 "use client";
 
-import { Contact } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  Contact,
+  Mail,
+  MessageSquareText,
+  RefreshCw,
+  Search,
+  Trash2,
+  Users,
+} from "lucide-react";
 import { useToast } from "@/components/providers/ToastProvider";
 import Skeleton from "@/components/ui/Skeleton";
 
+const CONTACTS_API =
+  "https://api.himalayanthakali.com/himalayanthakali_backend/contacts/get-contacts.php";
+const DELETE_CONTACT_API =
+  "https://api.himalayanthakali.com/himalayanthakali_backend/contacts/delete-contact.php";
+
+function formatDateTime(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Unknown";
+  return date.toLocaleString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function getInitials(name = "") {
+  const parts = name
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+
+  if (parts.length === 0) return "?";
+  if (parts.length === 1) return parts[0].slice(0, 1).toUpperCase();
+  return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+}
+
 export default function AdminContactPage() {
   const [messages, setMessages] = useState([]);
-  const [editing, setEditing] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const { showToast, showConfirm } = useToast();
 
-  const fetchMessages = async () => {
-    setIsLoading(true);
-    try {
-      const res = await fetch(
-        // "http://localhost/himalayanthakali_backend/contacts/get-contacts.php"
-          "https://api.himalayanthakali.com/himalayanthakali_backend/contacts/get-contacts.php"
+  const fetchMessages = useCallback(
+    async (manual = false) => {
+      if (manual) {
+        setIsRefreshing(true);
+      } else {
+        setIsLoading(true);
+      }
 
-      );
-      const data = await res.json();
-      setMessages(data);
-    } catch (error) {
-      console.error("Failed to fetch messages:", error);
-      setMessages([]);
-      showToast("Failed to load contact messages.", "error");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+      try {
+        const res = await fetch(CONTACTS_API);
+        const data = await res.json();
+        setMessages(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error("Failed to fetch messages:", error);
+        setMessages([]);
+        showToast("Failed to load contact messages.", "error");
+      } finally {
+        setIsLoading(false);
+        setIsRefreshing(false);
+      }
+    },
+    [showToast]
+  );
 
   useEffect(() => {
     fetchMessages();
-  }, []);
+  }, [fetchMessages]);
+
+  const filteredMessages = useMemo(() => {
+    const query = searchTerm.trim().toLowerCase();
+    if (!query) return messages;
+
+    return messages.filter((msg) => {
+      const haystack = [
+        msg.full_name,
+        msg.email,
+        msg.phone,
+        msg.message,
+      ]
+        .join(" ")
+        .toLowerCase();
+
+      return haystack.includes(query);
+    });
+  }, [messages, searchTerm]);
+
+  const todaysMessagesCount = useMemo(() => {
+    const today = new Date().toDateString();
+    return messages.filter((msg) => {
+      const date = new Date(msg.created_at);
+      return !Number.isNaN(date.getTime()) && date.toDateString() === today;
+    }).length;
+  }, [messages]);
+
+  const uniqueSenders = useMemo(() => {
+    const normalizedEmails = messages
+      .map((msg) => (msg.email || "").trim().toLowerCase())
+      .filter(Boolean);
+    return new Set(normalizedEmails).size;
+  }, [messages]);
 
   const deleteMessage = async (id) => {
     const confirmed = await showConfirm("Delete this message?", {
@@ -42,15 +117,11 @@ export default function AdminContactPage() {
     if (!confirmed) return;
 
     try {
-      const res = await fetch(
-        // "http://localhost/himalayanthakali_backend/contacts/delete-contact.php",
-        "https://api.himalayanthakali.com/himalayanthakali_backend/contacts/delete-contact.php",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id }),
-        }
-      );
+      const res = await fetch(DELETE_CONTACT_API, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
       const data = await res.json().catch(() => null);
 
       if (!res.ok || data?.success === false) {
@@ -58,7 +129,7 @@ export default function AdminContactPage() {
         return;
       }
 
-      await fetchMessages();
+      await fetchMessages(true);
       showToast(data?.message || "Message deleted.", "success");
     } catch (error) {
       console.error("Failed to delete message:", error);
@@ -66,201 +137,162 @@ export default function AdminContactPage() {
     }
   };
 
-  // const saveEdit = async () => {
-  //   try {
-  //     const res = await fetch(
-  //       // "http://localhost/himalayanthakali_backend/contacts/update-contact.php",
-  //       "https://api.himalayanthakali.com/himalayanthakali_backend/contacts/update-contact.php",
-  //       {
-  //         method: "POST",
-  //         headers: { "Content-Type": "application/json" },
-  //         body: JSON.stringify(editing),
-  //       }
-  //     );
-  //     const data = await res.json().catch(() => null);
-
-  //     if (!res.ok || data?.success === false) {
-  //       showToast(data?.message || "Failed to update message.", "error");
-  //       return;
-  //     }
-
-  //     setEditing(null);
-  //     await fetchMessages();
-  //     showToast(data?.message || "Message updated.", "success");
-  //   } catch (error) {
-  //     console.error("Failed to update message:", error);
-  //     showToast("Failed to update message.", "error");
-  //   }
-  // };
-
   return (
-    <div className="min-h-screen ">
-      <h1 className="text-2xl font-bold flex items-center gap-2 text-gray-800 mb-6">
-       <Contact className="text-[#E9842C] size-6"/>Contact Messages
-      </h1>
+    <div className="mx-auto max-w-7xl space-y-6">
+      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900">
+              <Contact className="h-6 w-6 text-[#E9842C]" />
+              Contact Messages
+            </h1>
+            <p className="mt-1 text-sm text-slate-500">
+              Monitor incoming inquiries and remove processed messages.
+            </p>
+          </div>
 
-      {/* TABLE */}
-      <div className="bg-white rounded-lg shadow overflow-x-auto">
-        <table className="w-full text-sm text-left text-gray-700">
-          <thead className="bg-gray-200 uppercase text-xs">
-            <tr>
-              <th className="px-4 py-3">Name</th>
-              <th className="px-4 py-3">Email</th>
-              <th className="px-4 py-3">Phone</th>
-              <th className="px-4 py-3">Message</th>
-              <th className="px-4 py-3">Date</th>
-              <th className="px-4 py-3 text-center">
-                Actions
-              </th>
-            </tr>
-          </thead>
+          <button
+            onClick={() => fetchMessages(true)}
+            disabled={isLoading || isRefreshing}
+            className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
+            {isRefreshing ? "Refreshing..." : "Refresh"}
+          </button>
+        </div>
 
-          <tbody>
-            {isLoading ? (
-              Array.from({ length: 5 }).map((_, index) => (
-                <tr key={`contact-row-skeleton-${index}`} className="border-b">
-                  <td className="px-4 py-3">
-                    <Skeleton className="h-4 w-28" />
-                  </td>
-                  <td className="px-4 py-3">
-                    <Skeleton className="h-4 w-36" />
-                  </td>
-                  <td className="px-4 py-3">
-                    <Skeleton className="h-4 w-24" />
-                  </td>
-                  <td className="px-4 py-3">
-                    <Skeleton className="h-4 w-full max-w-xs" />
-                  </td>
-                  <td className="px-4 py-2">
-                    <Skeleton className="h-4 w-24" />
-                  </td>
-                  <td className="px-4 py-2">
-                    <div className="flex justify-center">
-                      <Skeleton className="h-7 w-16" />
-                    </div>
-                  </td>
-                </tr>
-              ))
-            ) : messages.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="px-4 py-10 text-center text-gray-500">
-                  No contact messages found.
-                </td>
-              </tr>
-            ) : (
-              messages.map((msg) => (
-                <tr
-                  key={msg.id}
-                  className="border-b hover:bg-gray-50"
-                >
-                  <td className="px-4 py-3">
-                    {msg.full_name}
-                  </td>
-                  <td className="px-4 py-3">
-                    {msg.email}
-                  </td>
-                  <td className="px-4 py-3">
-                    {msg.phone}
-                  </td>
-                  <td className="px-4 py-3 max-w-xs truncate">
-                    {msg.message}
-                  </td>
-                  <td className="px-4 py-2 text-xs text-gray-500">
-                    {new Date(msg.created_at).toLocaleString()}
-                  </td>
-                  <td className="px-4 py-2 flex gap-2 justify-center">
-                    {/* <button
-                      onClick={() => setEditing(msg)}
-                      className="px-3 py-1 text-xs bg-blue-500 text-white  hover:bg-blue-600"
-                    >
-                      Edit
-                    </button> */}
-                    <button
-                      onClick={() => deleteMessage(msg.id)}
-                      className="px-3 py-1 text-xs bg-red-500 text-white hover:bg-red-600"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {/* EDIT MODAL */}
-      {editing && (
-        <div className="fixed inset-0 bg-black/30 flex items-center justify-center">
-          <div className="bg-white rounded-lg p-6 w-full max-w-lg">
-            <h2 className="text-xl font-semibold mb-4">
-              Edit Message
-            </h2>
-
-            <div className="space-y-3">
-              <input
-                className="w-full border rounded px-3 py-2"
-                value={editing.full_name}
-                onChange={(e) =>
-                  setEditing({
-                    ...editing,
-                    full_name: e.target.value,
-                  })
-                }
-              />
-
-              <input
-                className="w-full border rounded px-3 py-2"
-                value={editing.email}
-                onChange={(e) =>
-                  setEditing({
-                    ...editing,
-                    email: e.target.value,
-                  })
-                }
-              />
-
-              <input
-                className="w-full border rounded px-3 py-2"
-                value={editing.phone}
-                onChange={(e) =>
-                  setEditing({
-                    ...editing,
-                    phone: e.target.value,
-                  })
-                }
-              />
-
-              <textarea
-                rows={4}
-                className="w-full border rounded px-3 py-2"
-                value={editing.message}
-                onChange={(e) =>
-                  setEditing({
-                    ...editing,
-                    message: e.target.value,
-                  })
-                }
-              />
-            </div>
-
-            <div className="flex justify-end gap-3 mt-6">
-              <button
-                onClick={() => setEditing(null)}
-                className="px-4 py-2 border rounded"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={saveEdit}
-                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-              >
-                Save
-              </button>
-            </div>
+        <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+            <p className="text-xs font-semibold uppercase text-slate-500">Total Messages</p>
+            <p className="mt-2 text-2xl font-bold text-slate-900">{messages.length}</p>
+          </div>
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+            <p className="text-xs font-semibold uppercase text-slate-500">Received Today</p>
+            <p className="mt-2 text-2xl font-bold text-slate-900">{todaysMessagesCount}</p>
+          </div>
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+            <p className="text-xs font-semibold uppercase text-slate-500">Unique Senders</p>
+            <p className="mt-2 text-2xl font-bold text-slate-900">{uniqueSenders}</p>
           </div>
         </div>
-      )}
+      </section>
+
+      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <h2 className="text-lg font-bold text-slate-900">Inbox</h2>
+          <div className="relative w-full md:w-96">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search name, email, phone or message"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-9 pr-3 text-sm text-slate-700 outline-none transition focus:border-[#E9842C] focus:bg-white"
+            />
+          </div>
+        </div>
+
+        <div className="overflow-x-auto rounded-xl border border-slate-200">
+          <table className="w-full min-w-215 text-left">
+            <thead className="bg-slate-100 text-xs uppercase text-slate-500">
+              <tr>
+                <th className="px-4 py-3 font-semibold">Sender</th>
+                <th className="px-4 py-3 font-semibold">Contact</th>
+                <th className="px-4 py-3 font-semibold">Message</th>
+                <th className="px-4 py-3 font-semibold">Date</th>
+                <th className="px-4 py-3 text-center font-semibold">Actions</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {isLoading ? (
+                Array.from({ length: 6 }).map((_, index) => (
+                  <tr key={`contact-row-skeleton-${index}`} className="border-t border-slate-200">
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        <Skeleton className="h-10 w-10 rounded-full" />
+                        <Skeleton className="h-4 w-32" />
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <Skeleton className="mb-2 h-4 w-44" />
+                      <Skeleton className="h-4 w-28" />
+                    </td>
+                    <td className="px-4 py-3">
+                      <Skeleton className="h-4 w-full max-w-sm" />
+                    </td>
+                    <td className="px-4 py-3">
+                      <Skeleton className="h-4 w-32" />
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex justify-center">
+                        <Skeleton className="h-8 w-20" />
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : filteredMessages.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-4 py-14 text-center text-sm text-slate-500">
+                    {messages.length === 0
+                      ? "No contact messages found."
+                      : "No messages match your search."}
+                  </td>
+                </tr>
+              ) : (
+                filteredMessages.map((msg) => (
+                  <tr key={msg.id} className="border-t border-slate-200 hover:bg-slate-50/70">
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-100 text-sm font-bold text-[#E9842C]">
+                          {getInitials(msg.full_name)}
+                        </div>
+                        <div>
+                          <p className="font-semibold text-slate-800">{msg.full_name}</p>
+                          <p className="text-xs text-slate-500">#{msg.id}</p>
+                        </div>
+                      </div>
+                    </td>
+
+                    <td className="px-4 py-3 text-sm text-slate-600">
+                      <p className="inline-flex items-center gap-1.5">
+                        <Mail className="h-3.5 w-3.5 text-slate-400" />
+                        {msg.email || "-"}
+                      </p>
+                      <p className="mt-1 inline-flex items-center gap-1.5">
+                        <Users className="h-3.5 w-3.5 text-slate-400" />
+                        {msg.phone || "-"}
+                      </p>
+                    </td>
+
+                    <td className="px-4 py-3">
+                      <p className="max-w-sm truncate text-sm text-slate-700">
+                        {msg.message || "No message body"}
+                      </p>
+                    </td>
+
+                    <td className="px-4 py-3 text-sm text-slate-500">
+                      {formatDateTime(msg.created_at)}
+                    </td>
+
+                    <td className="px-4 py-3">
+                      <div className="flex justify-center">
+                        <button
+                          onClick={() => deleteMessage(msg.id)}
+                          className="inline-flex items-center gap-1 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-red-700"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </section>
     </div>
   );
 }
