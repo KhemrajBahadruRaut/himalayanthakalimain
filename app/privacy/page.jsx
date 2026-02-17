@@ -1,7 +1,14 @@
 "use client";
 
-import Navbar from "../../components/layout/navbar/Navbar";
-import Footer from "../../components/layout/footer/Footer";
+import dynamic from "next/dynamic";
+
+const Navbar = dynamic(() => import("../../components/layout/navbar/Navbar"), {
+  loading: () => <div className="h-24" />,
+});
+
+const Footer = dynamic(() => import("../../components/layout/footer/Footer"), {
+  loading: () => <div className="h-40" />,
+});
 
 export default function PrivacyPage() {
   return (

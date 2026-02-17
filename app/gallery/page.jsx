@@ -1,10 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
-import Footer from "../../components/layout/footer/Footer";
-import Navbar from "../../components/layout/navbar/Navbar";
 import { X, ZoomIn } from "lucide-react";
+
+const Navbar = dynamic(() => import("../../components/layout/navbar/Navbar"), {
+  loading: () => <div className="h-24" />,
+});
+
+const Footer = dynamic(() => import("../../components/layout/footer/Footer"), {
+  loading: () => <div className="h-40" />,
+});
 
 // const API = `${process.env.NEXT_PUBLIC_API_BASE || "http://localhost/himalayanthakali_backend"}/gallery`;
 const API = `${process.env.NEXT_PUBLIC_API_BASE || "https://api.himalayanthakali.com/himalayanthakali_backend"}/gallery`;

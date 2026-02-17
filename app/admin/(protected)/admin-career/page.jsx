@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState, useCallback } from "react";
-import CareerApplications from "./application/page";
+import dynamic from "next/dynamic";
 import { 
   Briefcase, 
   Mail, 
@@ -12,6 +12,14 @@ import {
   X 
 } from "lucide-react";
 import { useToast } from "@/components/providers/ToastProvider";
+
+const CareerApplications = dynamic(() => import("./application/page"), {
+  loading: () => (
+    <div className="rounded-2xl border border-zinc-200 bg-white p-8 text-zinc-500">
+      Loading applications...
+    </div>
+  ),
+});
 
 // const API = "http://localhost/himalayanthakali_backend/career";
   const API = "https://api.himalayanthakali.com/himalayanthakali_backend";

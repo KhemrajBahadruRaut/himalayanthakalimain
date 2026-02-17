@@ -1,14 +1,39 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Navbar from "../layout/navbar/Navbar.jsx";
-import Image from "next/image.js";
-import ShortIntro from "./shortIntro/ShortIntro.jsx";
-import VisitUs from "./visitUs/VisitUs.jsx";
-import OurMenu from "./ourMenu/OurMenu.jsx";
-import Testimonials from "./testimonials/Testimonials.jsx";
-import Footer from "../layout/footer/Footer.jsx";
+import dynamic from "next/dynamic";
+import Image from "next/image";
 import { useRouter } from "next/navigation.js";
+
+const SectionFallback = () => (
+  <div className="mx-auto max-w-7xl px-8 py-8">
+    <div className="h-24 animate-pulse rounded-xl bg-white/5" />
+  </div>
+);
+
+const Navbar = dynamic(() => import("../layout/navbar/Navbar.jsx"), {
+  loading: () => <div className="h-24" />,
+});
+
+const ShortIntro = dynamic(() => import("./shortIntro/ShortIntro.jsx"), {
+  loading: () => <SectionFallback />,
+});
+
+const VisitUs = dynamic(() => import("./visitUs/VisitUs.jsx"), {
+  loading: () => <SectionFallback />,
+});
+
+const OurMenu = dynamic(() => import("./ourMenu/OurMenu.jsx"), {
+  loading: () => <SectionFallback />,
+});
+
+const Testimonials = dynamic(() => import("./testimonials/Testimonials.jsx"), {
+  loading: () => <SectionFallback />,
+});
+
+const Footer = dynamic(() => import("../layout/footer/Footer.jsx"), {
+  loading: () => <div className="h-40" />,
+});
 
 
 export default function MainPage() {

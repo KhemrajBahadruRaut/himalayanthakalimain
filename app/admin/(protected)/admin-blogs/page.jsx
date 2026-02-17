@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import Quill from "quill";
 import "quill/dist/quill.snow.css";
 import { useToast } from "@/components/providers/ToastProvider";
 
@@ -15,6 +14,7 @@ const AdminBlogs = () => {
   const [blogs, setBlogs] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [imageFile, setImageFile] = useState(null);
+  const [editorLoading, setEditorLoading] = useState(true);
   const { showToast, showConfirm } = useToast();
 
   const [formData, setFormData] = useState({
@@ -25,27 +25,47 @@ const AdminBlogs = () => {
 
   // ================= Initialize Quill =================
   useEffect(() => {
-    if (editorRef.current && !quillRef.current) {
-      quillRef.current = new Quill(editorRef.current, {
-        theme: "snow",
-        modules: {
-          toolbar: [
-            [{ header: [1, 2, 3, false] }],
-            ["bold", "italic", "underline", "strike"],
-            [{ list: "ordered" }, { list: "bullet" }],
-            ["link", "image"],
-            ["clean"],
-          ],
-        },
-      });
+    let mounted = true;
 
-      quillRef.current.on("text-change", () => {
-        setFormData((prev) => ({
-          ...prev,
-          content: quillRef.current.root.innerHTML,
-        }));
-      });
-    }
+    const initializeEditor = async () => {
+      if (!editorRef.current || quillRef.current) {
+        if (mounted) setEditorLoading(false);
+        return;
+      }
+
+      try {
+        const { default: Quill } = await import("quill");
+        if (!mounted || !editorRef.current || quillRef.current) return;
+
+        quillRef.current = new Quill(editorRef.current, {
+          theme: "snow",
+          modules: {
+            toolbar: [
+              [{ header: [1, 2, 3, false] }],
+              ["bold", "italic", "underline", "strike"],
+              [{ list: "ordered" }, { list: "bullet" }],
+              ["link", "image"],
+              ["clean"],
+            ],
+          },
+        });
+
+        quillRef.current.on("text-change", () => {
+          setFormData((prev) => ({
+            ...prev,
+            content: quillRef.current.root.innerHTML,
+          }));
+        });
+      } finally {
+        if (mounted) setEditorLoading(false);
+      }
+    };
+
+    initializeEditor();
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   // ================= Sync Content When Editing =================
@@ -210,11 +230,18 @@ const AdminBlogs = () => {
             rows="3"
           />
 
-          <div
-            ref={editorRef}
-            className="bg-white border rounded"
-            style={{ minHeight: "250px" }}
-          />
+          <div className="relative">
+            {editorLoading && (
+              <div className="absolute inset-0 z-10 flex items-center justify-center rounded border bg-gray-50 text-sm text-gray-500">
+                Loading editor...
+              </div>
+            )}
+            <div
+              ref={editorRef}
+              className="bg-white border rounded"
+              style={{ minHeight: "250px" }}
+            />
+          </div>
 
           <input
             type="file"
@@ -277,6 +304,8 @@ const AdminBlogs = () => {
                             src={`${API_BASE}/${blog.image}`}
                             alt={blog.title}
                             className="w-20 h-16 object-cover rounded"
+                            loading="lazy"
+                            decoding="async"
                           />
                         ) : (
                           <span className="text-gray-400 text-sm">

@@ -1,6 +1,13 @@
 import Image from "next/image";
-import Navbar from "../../../components/layout/navbar/Navbar";
-import Footer from "../../../components/layout/footer/Footer";
+import dynamicImport from "next/dynamic";
+
+const Navbar = dynamicImport(() => import("../../../components/layout/navbar/Navbar"), {
+  loading: () => <div className="h-24" />,
+});
+
+const Footer = dynamicImport(() => import("../../../components/layout/footer/Footer"), {
+  loading: () => <div className="h-40" />,
+});
 
 export const dynamic = "force-dynamic";
 
@@ -27,7 +34,7 @@ async function getBlog(id) {
 }
 
 export default async function BlogDetails({ searchParams }) {
-  // ✅ DO NOT use await here
+  // DO NOT use await here
   const id = searchParams?.id;
 
   if (!id) {

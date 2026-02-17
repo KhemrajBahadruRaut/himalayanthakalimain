@@ -1,9 +1,16 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import { MapPin, Clock, Phone } from "lucide-react";
-import Navbar from "../../components/layout/navbar/Navbar.jsx";
-import Footer from "../../components/layout/footer/Footer.jsx";
+
+const Navbar = dynamic(() => import("../../components/layout/navbar/Navbar.jsx"), {
+  loading: () => <div className="h-24" />,
+});
+
+const Footer = dynamic(() => import("../../components/layout/footer/Footer.jsx"), {
+  loading: () => <div className="h-40" />,
+});
 
 const CONTACT_API =
   // `${process.env.NEXT_PUBLIC_API_BASE || "http://localhost/himalayanthakali_backend"}/contacts/submit-contact.php`;

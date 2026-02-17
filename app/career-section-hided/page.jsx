@@ -1,10 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import Navbar from "../../components/layout/navbar/Navbar";
-import Footer from "../../components/layout/footer/Footer";
+import dynamic from "next/dynamic";
 import { useEffect } from "react";
 import { useToast } from "@/components/providers/ToastProvider";
+
+const Navbar = dynamic(() => import("../../components/layout/navbar/Navbar"), {
+  loading: () => <div className="h-24" />,
+});
+
+const Footer = dynamic(() => import("../../components/layout/footer/Footer"), {
+  loading: () => <div className="h-40" />,
+});
 
 // const API = "http://localhost/himalayanthakali_backend/career";
 const API = "https://api.himalayanthakali.com/himalayanthakali_backend/career";

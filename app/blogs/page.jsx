@@ -1,11 +1,18 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import Image from "next/image";
 import { Calendar } from "lucide-react";
-import Navbar from "../../components/layout/navbar/Navbar";
-import Footer from "../../components/layout/footer/Footer";
+
+const Navbar = dynamic(() => import("../../components/layout/navbar/Navbar"), {
+  loading: () => <div className="h-24" />,
+});
+
+const Footer = dynamic(() => import("../../components/layout/footer/Footer"), {
+  loading: () => <div className="h-40" />,
+});
 
 // const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost/himalayanthakali_backend";
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "https://api.himalayanthakali.com/himalayanthakali_backend";

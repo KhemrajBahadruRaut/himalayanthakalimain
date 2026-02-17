@@ -1,9 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
-import Navbar from "../../components/layout/navbar/Navbar";
-import Footer from "../../components/layout/footer/Footer";
+
+const Navbar = dynamic(() => import("../../components/layout/navbar/Navbar"), {
+  loading: () => <div className="h-24" />,
+});
+
+const Footer = dynamic(() => import("../../components/layout/footer/Footer"), {
+  loading: () => <div className="h-40" />,
+});
 
 export default function HimalayantThakaliAbout() {
   const [isVisible, setIsVisible] = useState(false);

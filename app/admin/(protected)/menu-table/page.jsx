@@ -343,6 +343,8 @@ export default function MenuAdmin() {
       }
       alt={item.name || "Image"}
       className="h-full w-full object-cover"
+      loading="lazy"
+      decoding="async"
       onError={(e) => {
         e.currentTarget.src =
           "https://via.placeholder.com/80?text=No+Image";

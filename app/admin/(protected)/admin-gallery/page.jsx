@@ -324,6 +324,8 @@ export default function GalleryAdmin() {
                     src={`${API}/${img.image_path}`}
                     className="h-56 w-full object-cover transition-transform duration-500 group-hover:scale-105"
                     alt={img.alt_text}
+                    loading="lazy"
+                    decoding="async"
                   />
                   
                   {/* Persistent Mobile-Friendly Actions */}
