@@ -33,6 +33,8 @@ export default function GalleryAdmin() {
   const [isCategoriesLoading, setIsCategoriesLoading] = useState(true);
   const [isGalleryLoading, setIsGalleryLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [editingImagePath, setEditingImagePath] = useState("");
+  const [selectedImagePreviewUrl, setSelectedImagePreviewUrl] = useState("");
 
   const [form, setForm] = useState({
     id: null,
@@ -112,6 +114,17 @@ export default function GalleryAdmin() {
     fetchCategories();
   }, [fetchCategories]);
 
+  useEffect(() => {
+    if (!form.image) {
+      setSelectedImagePreviewUrl("");
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(form.image);
+    setSelectedImagePreviewUrl(objectUrl);
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [form.image]);
+
   const addCategory = async () => {
     if (!newCategory.trim()) {
       showToast("Enter a category name first.", "warning");
@@ -180,10 +193,12 @@ export default function GalleryAdmin() {
       span: image.span || "normal",
       image: null,
     });
+    setEditingImagePath(image.image_path || "");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const cancelEdit = () => {
+    setEditingImagePath("");
     setForm({ id: null, alt_text: "", span: "normal", image: null });
   };
 
@@ -245,6 +260,7 @@ export default function GalleryAdmin() {
         return;
       }
 
+      setEditingImagePath("");
       setForm({ id: null, alt_text: "", span: "normal", image: null });
       await fetchGallery(activeCategory);
       showToast(data?.message || (form.id ? "Image updated." : "Image uploaded."), "success");
@@ -263,6 +279,11 @@ export default function GalleryAdmin() {
       (image.alt_text || "").toLowerCase().includes(query)
     );
   }, [gallery, searchTerm]);
+  const galleryPreviewUrl = useMemo(() => {
+    if (selectedImagePreviewUrl) return selectedImagePreviewUrl;
+    if (form.id && editingImagePath) return getImageUrl(editingImagePath);
+    return "";
+  }, [selectedImagePreviewUrl, form.id, editingImagePath]);
 
   return (
     <div className="mx-auto max-w-7xl space-y-6">
@@ -429,10 +450,34 @@ export default function GalleryAdmin() {
                     <input
                       type="file"
                       onChange={(e) =>
-                        setForm({ ...form, image: e.target.files?.[0] || null })
+                        setForm((prev) => ({
+                          ...prev,
+                          image: e.target.files?.[0] || null,
+                        }))
                       }
                       className="w-full text-sm text-slate-500 file:mr-4 file:rounded-lg file:border-0 file:bg-slate-900 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-white"
                     />
+                  </div>
+
+                  <div className="md:col-span-2 overflow-hidden rounded-xl border border-slate-200 bg-white">
+                    {galleryPreviewUrl ? (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img
+                        src={galleryPreviewUrl}
+                        alt="Gallery preview"
+                        className="h-76 w-full object-contain"
+                      />
+                    ) : (
+                      <div className="flex h-56 items-center justify-center text-sm text-slate-400">
+                        No image selected
+                      </div>
+                    )}
+                    <div className="border-t border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-500">
+                      {form.image?.name ||
+                        (form.id && editingImagePath
+                          ? "Current image retained"
+                          : "No file selected")}
+                    </div>
                   </div>
 
                   <button
@@ -491,7 +536,7 @@ export default function GalleryAdmin() {
                           decoding="async"
                         />
 
-                        <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-2 bg-gradient-to-t from-black/90 via-black/30 to-transparent p-3">
+                        <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-2 bg-linear-to-t from-black/90 via-black/30 to-transparent p-3">
                           <div className="min-w-0">
                             <p className="truncate text-sm font-semibold text-white">
                               {image.alt_text || "Untitled image"}

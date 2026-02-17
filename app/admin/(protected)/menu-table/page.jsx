@@ -29,6 +29,7 @@ export default function MenuAdmin() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isItemsLoading, setIsItemsLoading] = useState(false);
   const [isCategoriesLoading, setIsCategoriesLoading] = useState(true);
+  const [menuImagePreviewUrl, setMenuImagePreviewUrl] = useState("");
 
   const [form, setForm] = useState({
     name: "",
@@ -101,6 +102,17 @@ export default function MenuAdmin() {
   useEffect(() => {
     fetchCategories();
   }, [fetchCategories]);
+
+  useEffect(() => {
+    if (!form.image) {
+      setMenuImagePreviewUrl("");
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(form.image);
+    setMenuImagePreviewUrl(objectUrl);
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [form.image]);
 
   const handleCategoryClick = async (id) => {
     setActiveCategory(id);
@@ -376,10 +388,30 @@ export default function MenuAdmin() {
                       type="file"
                       accept="image/*"
                       onChange={(e) =>
-                        setForm({ ...form, image: e.target.files?.[0] || null })
+                        setForm((prev) => ({
+                          ...prev,
+                          image: e.target.files?.[0] || null,
+                        }))
                       }
                       className="w-full text-sm text-slate-500 file:mr-4 file:rounded-lg file:border-0 file:bg-slate-900 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-white"
                     />
+                  </div>
+                  <div className="md:col-span-2 overflow-hidden rounded-xl border border-slate-200 bg-white">
+                    {menuImagePreviewUrl ? (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img
+                        src={menuImagePreviewUrl}
+                        alt="Menu item preview"
+                        className="h-56 w-full object-contain"
+                      />
+                    ) : (
+                      <div className="flex h-56 items-center justify-center text-sm text-slate-400">
+                        No image selected
+                      </div>
+                    )}
+                    <div className="border-t border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-500">
+                      {form.image?.name || "No file selected"}
+                    </div>
                   </div>
                   <button
                     onClick={addItem}

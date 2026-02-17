@@ -21,6 +21,12 @@ function stripHtml(value = "") {
   return value.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 }
 
+function getImageUrl(path = "") {
+  if (!path) return "";
+  if (path.startsWith("http://") || path.startsWith("https://")) return path;
+  return `${API_BASE}/${path.replace(/^\/+/, "")}`;
+}
+
 function formatDate(dateValue) {
   const date = new Date(dateValue);
   if (Number.isNaN(date.getTime())) return "Unknown date";
@@ -38,6 +44,9 @@ export default function AdminBlogs() {
   const [blogs, setBlogs] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [imageFile, setImageFile] = useState(null);
+  const [existingImagePath, setExistingImagePath] = useState("");
+  const [selectedImagePreviewUrl, setSelectedImagePreviewUrl] = useState("");
+  const [isEditDataLoading, setIsEditDataLoading] = useState(false);
   const [editorLoading, setEditorLoading] = useState(true);
   const [blogsLoading, setBlogsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -48,12 +57,17 @@ export default function AdminBlogs() {
     short_description: "",
     content: "",
   });
+  const formDataRef = useRef(formData);
 
   const contentText = stripHtml(formData.content);
   const canSubmit =
     formData.title.trim().length > 0 &&
     formData.short_description.trim().length > 0 &&
     contentText.length > 0;
+  const coverImagePreview = useMemo(() => {
+    if (selectedImagePreviewUrl) return selectedImagePreviewUrl;
+    return getImageUrl(existingImagePath);
+  }, [selectedImagePreviewUrl, existingImagePath]);
 
   const filteredBlogs = useMemo(() => {
     const query = searchTerm.trim().toLowerCase();
@@ -65,6 +79,10 @@ export default function AdminBlogs() {
       return title.includes(query) || description.includes(query);
     });
   }, [blogs, searchTerm]);
+
+  useEffect(() => {
+    formDataRef.current = formData;
+  }, [formData]);
 
   const recentBlogsCount = useMemo(() => {
     const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
@@ -99,6 +117,7 @@ export default function AdminBlogs() {
             ],
           },
         });
+        quillRef.current.root.innerHTML = formDataRef.current.content || "";
 
         quillRef.current.on("text-change", () => {
           setFormData((prev) => ({
@@ -119,10 +138,15 @@ export default function AdminBlogs() {
   }, []);
 
   useEffect(() => {
-    if (quillRef.current && editingId !== null) {
-      quillRef.current.root.innerHTML = formData.content;
+    if (!imageFile) {
+      setSelectedImagePreviewUrl("");
+      return;
     }
-  }, [editingId, formData.content]);
+
+    const objectUrl = URL.createObjectURL(imageFile);
+    setSelectedImagePreviewUrl(objectUrl);
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [imageFile]);
 
   const fetchBlogs = useCallback(async () => {
     setBlogsLoading(true);
@@ -154,9 +178,25 @@ export default function AdminBlogs() {
     }));
   };
 
+  const applyBlogToForm = useCallback((blogData = {}) => {
+    const nextForm = {
+      title: blogData.title || "",
+      short_description: blogData.short_description || blogData.description || "",
+      content: blogData.content || "",
+    };
+
+    setFormData(nextForm);
+
+    if (quillRef.current) {
+      quillRef.current.root.innerHTML = nextForm.content;
+    }
+  }, []);
+
   const resetForm = () => {
     setEditingId(null);
     setImageFile(null);
+    setExistingImagePath("");
+    setIsEditDataLoading(false);
     setFormData({
       title: "",
       short_description: "",
@@ -271,19 +311,35 @@ export default function AdminBlogs() {
     }
   };
 
-  const handleEdit = (blog) => {
+  const handleEdit = async (blog) => {
     setEditingId(blog.id);
-    setFormData({
-      title: blog.title || "",
-      short_description: blog.short_description || "",
-      content: blog.content || "",
-    });
-
-    if (quillRef.current) {
-      quillRef.current.root.innerHTML = blog.content || "";
-    }
+    setImageFile(null);
+    setExistingImagePath(blog.image || "");
+    applyBlogToForm(blog);
 
     window.scrollTo({ top: 0, behavior: "smooth" });
+
+    if (Object.prototype.hasOwnProperty.call(blog, "content")) {
+      return;
+    }
+
+    setIsEditDataLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/blogs/get_single_blog.php?id=${blog.id}`);
+      const data = await res.json();
+
+      if (data?.success && data?.data) {
+        setExistingImagePath(data.data.image || blog.image || "");
+        applyBlogToForm(data.data);
+      } else {
+        showToast(data?.message || "Could not load full blog content.", "warning");
+      }
+    } catch (error) {
+      console.error("Failed to fetch full blog content:", error);
+      showToast("Could not load full blog content.", "error");
+    } finally {
+      setIsEditDataLoading(false);
+    }
   };
 
   return (
@@ -313,7 +369,10 @@ export default function AdminBlogs() {
           <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
             <p className="text-xs font-semibold uppercase text-slate-500">Attached Image</p>
             <p className="mt-2 truncate text-sm font-semibold text-slate-700">
-              {imageFile?.name || "No image selected"}
+              {imageFile?.name ||
+                (editingId && existingImagePath
+                  ? "Current image retained"
+                  : "No image selected")}
             </p>
           </div>
         </div>
@@ -327,6 +386,11 @@ export default function AdminBlogs() {
               {editingId ? "Update Blog Post" : "Create New Blog Post"}
             </h2>
           </div>
+          {isEditDataLoading && (
+            <p className="text-xs font-medium text-slate-500">
+              Loading full blog content...
+            </p>
+          )}
           {editingId && (
             <button
               onClick={resetForm}
@@ -390,8 +454,21 @@ export default function AdminBlogs() {
                 className="text-sm text-slate-600 file:mr-4 file:rounded-lg file:border-0 file:bg-slate-900 file:px-4 file:py-2 file:text-xs file:font-semibold file:text-white hover:file:bg-slate-800"
               />
               <p className="text-xs text-slate-500">
-                {imageFile?.name || "No file selected"}
+                {imageFile?.name ||
+                  (editingId && existingImagePath
+                    ? "Current image retained"
+                    : "No file selected")}
               </p>
+              {coverImagePreview && (
+                <div className="overflow-hidden flex justify-center rounded-lg border border-slate-200 bg-white">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={coverImagePreview}
+                    alt="Cover preview"
+                    className="object-contain h-44"
+                  />
+                </div>
+              )}
             </div>
           </div>
 
@@ -505,7 +582,7 @@ export default function AdminBlogs() {
               </thead>
               <tbody>
                 {filteredBlogs.map((blog) => (
-                  <tr key={blog.id} className="border-t border-slate-200 hover:bg-slate-50/70">
+                  <tr key={blog.id} className="border-t border-slate-200  hover:bg-slate-50/70">
                     <td className="px-4 py-3">
                       <div className="flex min-w-60 items-center gap-3">
                         {blog.image ? (
@@ -523,7 +600,7 @@ export default function AdminBlogs() {
                           </div>
                         )}
                         <div>
-                          <p className="truncate text-sm font-semibold text-slate-800">
+                          <p className="truncate text-sm font-semibold text-slate-800 text-wrap">
                             {blog.title}
                           </p>
                           <p className="text-xs text-slate-500">ID #{blog.id}</p>
