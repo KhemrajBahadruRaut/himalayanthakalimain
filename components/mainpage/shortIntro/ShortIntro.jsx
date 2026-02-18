@@ -1,10 +1,9 @@
-import React from 'react'
+import React from "react";
 import { motion } from "framer-motion";
 
 const ShortIntro = () => {
   return (
     <div>
-      
       {/* Short Intro Divider */}
       <div className="flex items-center justify-center gap-4 pt-20 px-8">
         <div className="h-px  bg-linear-to-r from-transparent via-[#E9842C] to-transparent w-80" />
@@ -45,14 +44,20 @@ const ShortIntro = () => {
             About Himalayan Thakali
           </h2>
 
-          <p className="text-gray-300 sm:px-8 lg:px-0 text-justify leading-relaxed max-w-4xl  mx-auto text-lg">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
-            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-            aliquip ex ea commodo consequat. Duis aute irure dolor in
-            reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-            pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-            culpa qui officia deserunt mollit anim id est laborum.
+          <p className="text-gray-300 sm:px-8 lg:px-0 text-center leading-relaxed max-w-4xl  mx-auto text-lg">
+            Nestled in the heart of Mid Baneshwor, Himalayan Thakali brings you
+            the true essence of the Thakali Bhanchha — a culinary tradition
+            celebrated for its balance, purity, and legendary hospitality.
+            Rooted in slow-cooking methods, Himalayan herbs, and carefully
+            crafted spice blends, every Thali reflects generations of heritage
+          and flavor.
+
+          <br />
+          <br /> 
+            
+            Experience authentic Himalayan comfort food made with
+            local ingredients, traditional techniques, and warmth that feels
+            like home.
           </p>
 
           <div className="relative border-r-4 border-[#E9842C] pr-12 mt-8 flex justify-end">
@@ -61,7 +66,7 @@ const ShortIntro = () => {
         </motion.div>
       </section>
     </div>
-  )
-}
+  );
+};
 
-export default ShortIntro
+export default ShortIntro;
