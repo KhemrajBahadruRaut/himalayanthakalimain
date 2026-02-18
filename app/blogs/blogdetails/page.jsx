@@ -1,17 +1,21 @@
 import Image from "next/image";
 import dynamicImport from "next/dynamic";
 
-const Navbar = dynamicImport(() => import("../../../components/layout/navbar/Navbar"), {
-  loading: () => <div className="h-24" />,
-});
-
-const Footer = dynamicImport(() => import("../../../components/layout/footer/Footer"), {
-  loading: () => <div className="h-40" />,
-});
-
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs"; // ensures stable server fetch
 
-const API_BASE = "https://api.himalayanthakali.com/himalayanthakali_backend";
+const Navbar = dynamicImport(
+  () => import("../../../components/layout/navbar/Navbar"),
+  { loading: () => <div className="h-24" /> }
+);
+
+const Footer = dynamicImport(
+  () => import("../../../components/layout/footer/Footer"),
+  { loading: () => <div className="h-40" /> }
+);
+
+const API_BASE =
+  "https://api.himalayanthakali.com/himalayanthakali_backend";
 
 async function getBlog(id) {
   if (!id) return null;
@@ -25,7 +29,6 @@ async function getBlog(id) {
     if (!res.ok) return null;
 
     const data = await res.json();
-
     return data.success ? data.data : null;
   } catch (error) {
     console.error("Blog fetch error:", error);
@@ -33,16 +36,68 @@ async function getBlog(id) {
   }
 }
 
+/* ============================= */
+/* ✅ FACEBOOK / WHATSAPP PREVIEW */
+/* ============================= */
+
+export async function generateMetadata({ searchParams }) {
+  try {
+    const id = searchParams?.id;
+    if (!id) return {};
+
+    const blog = await getBlog(id);
+    if (!blog) return {};
+
+    const imageUrl = `${API_BASE}/${blog.image}`;
+    const pageUrl = `https://himalayanthakali.com/blogs/blogdetails?id=${id}`;
+
+    return {
+      title: blog.title,
+      description: blog.short_description,
+      openGraph: {
+        title: blog.title,
+        description: blog.short_description,
+        type: "article",
+        url: pageUrl,
+        images: [
+          {
+            url: imageUrl,
+            width: 1200,
+            height: 630,
+          },
+        ],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: blog.title,
+        description: blog.short_description,
+        images: [imageUrl],
+      },
+    };
+  } catch (error) {
+    console.error("Metadata error:", error);
+    return {};
+  }
+}
+
+/* ============================= */
+/* ✅ BLOG PAGE */
+/* ============================= */
+
 export default async function BlogDetails({ searchParams, params }) {
+
+  // keep this because your setup depends on it
   const resolvedSearchParams = await searchParams;
   const resolvedParams = await params;
 
   const searchId = Array.isArray(resolvedSearchParams?.id)
     ? resolvedSearchParams?.id[0]
     : resolvedSearchParams?.id;
+
   const paramId = Array.isArray(resolvedParams?.id)
     ? resolvedParams?.id[0]
     : resolvedParams?.id;
+
   const id = searchId || paramId;
 
   if (!id) {
@@ -81,6 +136,7 @@ export default async function BlogDetails({ searchParams, params }) {
               priority
               sizes="(max-width: 1024px) 100vw, 1024px"
               className="rounded object-cover"
+              unoptimized
             />
           </div>
 
