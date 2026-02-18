@@ -190,48 +190,40 @@ export default function HimalayantThakaliAbout() {
               fontSize: "0.95rem",
             }}
           >
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
-            ad minim veniam.
-          </p>
-
-          <p
-            className="text-gray-300 leading-relaxed mb-6 text-center"
-            style={{
-              fontFamily: "Montserrat, sans-serif",
-              fontWeight: 300,
-              fontSize: "0.95rem",
-            }}
-          >
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
-            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-            aliquip ex ea commodo consequat. Duis aute irure dolor in
-            reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-            pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-            culpa qui officia deserunt mollit anim id est laborum.
-          </p>
-
-          <p
-            className="text-gray-300 leading-relaxed text-center"
-            style={{
-              fontFamily: "Montserrat, sans-serif",
-              fontWeight: 300,
-              fontSize: "0.95rem",
-            }}
-          >
-            Duis aute irure dolor in reprehenderit in voluptate velit esse
-            cillum dolore eu fugiat, nulla pariatur. Excepteur sint occaecat
-            cupidatat non proident, sunt in culpa qui officia deserunt mollit
-            anim id est laborum.
+            At Himalayan Thakali, we believe that true flavor is a reflection of
+            heritage. Located in the heart of Mid Baneshwor, our restaurant is
+            dedicated to preserving the authentic culinary art of the Thakali
+            community a culture world-renowned for its legendary hospitality and
+            mastery of the kitchen.
+            <br />
+            <br />
+            The Art of the Thakali Bhanchha Our kitchen is built on the
+            principles of the traditional Thakali Bhanchha. We don't rely on
+            modern shortcuts; instead, we honor the slow-cooking methods and
+            specific spice blends that have made Thakali cuisine the gold
+            standard of Himalayan comfort food.
+            <br />
+            <br />
+            <strong>Our Commitment to Quality Locally Sourced:</strong> We prioritize fresh,
+            high-quality ingredients sourced from local producers to ensure
+            every meal supports our community and tastes like home.
+            <br />
+            <strong>Authentic Techniques:</strong> Our recipes are rooted in tradition, ensuring
+            the perfect balance of spice, texture, and nutrition.
+            <br />
+           <strong> Warm Hospitality:</strong> Inspired by the traditional inns of the Himalayas,
+            we welcome every guest with the same warmth and care that the
+            Thakali people are famous for.
+            <br />
+            Experience the heritage of the Himalayas through flavors that have
+            stood the test of time. Taste awaits you.
           </p>
         </div>
 
         {/* Profile Section */}
-        <div
+        {/* <div
           className={`sm:flex  gap-16 items-center max-w-5xl mx-auto mb-20 opacity-0 ${isVisible ? "animate-in delay-2" : ""}`}
         >
-          {/* Profile Image */}
           <div className="relative flex justify-center ">
             <div className="relative">
               <div className="absolute inset-0 -m-6">
@@ -256,7 +248,6 @@ export default function HimalayantThakaliAbout() {
             </div>
           </div>
 
-          {/* Quote */}
           <div className="relative  px-8 md:px-10">
             <div className="quote-mark absolute top-15 -left-4 md:-left-2 transform -scale-x-100  -scale-y-100">
               <svg
@@ -327,13 +318,12 @@ export default function HimalayantThakaliAbout() {
               </svg>
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/*2nd Section */}
-        <div
+        {/* <div
           className={`hidden sm:flex  gap-16 items-center max-w-5xl mx-auto mb-20 opacity-0 ${isVisible ? "animate-in delay-2" : ""}`}
         >
-          {/* Quote */}
           <div className="relative  px-8 md:px-10">
             <div className="relative pt-5 sm:pt-2">
               <p
@@ -353,7 +343,6 @@ export default function HimalayantThakaliAbout() {
               </p>
             </div>
           </div>
-          {/* Profile Image */}
           <div className="relative flex justify-center ">
             <div className="relative">
               <div className="absolute inset-0 -m-6">
@@ -377,13 +366,12 @@ export default function HimalayantThakaliAbout() {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* 2nd section mobile view */}
-        <div
+        {/* <div
           className={`sm:hidden gap-16 items-center max-w-5xl mx-auto mb-20 opacity-0 ${isVisible ? "animate-in delay-2" : ""}`}
         >
-          {/* Profile Image */}
           <div className="relative flex justify-center ">
             <div className="relative">
               <div className="absolute inset-0 -m-6">
@@ -408,7 +396,6 @@ export default function HimalayantThakaliAbout() {
             </div>
           </div>
 
-          {/* Quote */}
           <div className="relative  px-8 md:px-10">
             <div className="relative pt-5 sm:pt-2">
               <p
@@ -428,13 +415,12 @@ export default function HimalayantThakaliAbout() {
               </p>
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/*3rd Section */}
-        <div
+        {/* <div
           className={`sm:flex  gap-16 items-center max-w-5xl mx-auto mb-20 opacity-0 ${isVisible ? "animate-in delay-2" : ""}`}
         >
-          {/* Profile Image */}
           <div className="relative flex justify-center ">
             <div className="relative">
               <div className="absolute inset-0 -m-6">
@@ -459,7 +445,6 @@ export default function HimalayantThakaliAbout() {
             </div>
           </div>
 
-          {/* Quote */}
           <div className="relative  px-8 md:px-10">
             <div className="relative pt-5 sm:pt-2">
               <p
@@ -479,7 +464,7 @@ export default function HimalayantThakaliAbout() {
               </p>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
 
       <Footer />
