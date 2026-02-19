@@ -140,11 +140,11 @@ const VisitUs = () => {
 
               <h3 className="text-xl font-bold mb-3">Contact Us</h3>
               <p className="text-[#D97634] font-semibold mb-2">
-                +977 0000000000
+                +977 9851158465
               </p>
-              <p className="text-[#D97634] font-semibold mb-4">
+              {/* <p className="text-[#D97634] font-semibold mb-4">
                 +977 0000000000
-              </p>
+              </p> */}
               <p className="text-gray-400 text-sm leading-relaxed">
                 You can contact us directly for any queries
               </p>

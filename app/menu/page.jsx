@@ -86,7 +86,9 @@ const MenuPage = () => {
           const firstCategoryId = categoriesData[0].id;
           setActiveCategory(firstCategoryId);
 
-          const itemsRes = await fetch(`${API}/get_items.php?category_id=${firstCategoryId}`);
+          const itemsRes = await fetch(
+            `${API}/get_items.php?category_id=${firstCategoryId}`,
+          );
           const itemsData = await itemsRes.json();
 
           if (isCancelled) return;
@@ -126,11 +128,14 @@ const MenuPage = () => {
       <div className="bg-[#1E1E1E] pt-30 text-white">
         <div className="flex flex-col lg:flex-row">
           <aside className="w-full border-b border-gray-800 p-4 pt-20 lg:w-64 lg:border-r lg:border-b-0">
-            <h2 className="mb-4 text-center text-xl font-bold text-[#E9842C] lg:mb-6">
+            <h2 className="mb-4 text-center lg:mb-6 text-[#D97634] text-sm tracking-[0.3em] font-light">
               MENU
             </h2>
 
-            <nav aria-label="Menu categories" className="overflow-x-auto lg:overflow-visible">
+            <nav
+              aria-label="Menu categories"
+              className="overflow-x-auto lg:overflow-visible"
+            >
               {isInitialLoading ? (
                 <MenuCategorySkeleton />
               ) : (
@@ -159,16 +164,18 @@ const MenuPage = () => {
           <main className="flex-1 p-4 sm:p-6 lg:p-8">
             <div className="mb-10 text-center">
               <div className="mb-4 flex items-center justify-center gap-3">
-                <div className="h-px w-20 bg-linear-to-r from-transparent to-orange-500 sm:w-32" />
-                <div className="flex items-center gap-2 text-[#E9842C]">
-                  <span className="text-sm font-medium tracking-wider uppercase">
-                    Our Menu
-                  </span>
-                </div>
-                <div className="h-px w-20 bg-linear-to-l from-transparent to-orange-500 sm:w-32" />
+              <div className="h-px  md:w-56 bg-linear-to-r from-transparent to-[#D97634]" />
+            <span
+              className="text-[#D97634] text-sm tracking-[0.2em] font-light"
+            >
+             OUR MENU 
+            </span>
+            <div className="h-px  md:w-56 bg-linear-to-l from-transparent to-[#D97634]" />
               </div>
 
-              <h1 className="text-2xl font-serif sm:text-3xl lg:text-4xl">From Our Kitchen</h1>
+              <h1 className="text-2xl font-serif sm:text-3xl lg:text-4xl">
+                From Our Kitchen
+              </h1>
             </div>
 
             {isInitialLoading || isItemsLoading ? (
@@ -176,7 +183,9 @@ const MenuPage = () => {
             ) : items.length === 0 ? (
               <div className="flex items-center justify-center py-20">
                 <div className="text-center">
-                  <h3 className="mb-2 text-xl font-semibold text-gray-300">No Items Available</h3>
+                  <h3 className="mb-2 text-xl font-semibold text-gray-300">
+                    No Items Available
+                  </h3>
                   <p className="text-sm text-gray-500">
                     There are no items in this category at the moment.
                   </p>
@@ -184,7 +193,10 @@ const MenuPage = () => {
               </div>
             ) : (
               <>
-                <section className="mx-auto mb-10 grid max-w-6xl grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3" aria-label="Menu items">
+                <section
+                  className="mx-auto mb-10 grid max-w-6xl grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3"
+                  aria-label="Menu items"
+                >
                   {items.slice(0, 3).map((item) => (
                     <button
                       key={item.id}
@@ -195,7 +207,11 @@ const MenuPage = () => {
                     >
                       <div className="relative mx-auto mb-4 aspect-square max-w-55 overflow-hidden rounded-full bg-gray-700">
                         <Image
-                          src={item.image ? `${API}/uploads/${item.image}` : "/placeholder.png"}
+                          src={
+                            item.image
+                              ? `${API}/uploads/${item.image}`
+                              : "/placeholder.png"
+                          }
                           alt={item.name}
                           fill
                           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -203,15 +219,24 @@ const MenuPage = () => {
                         />
                       </div>
 
-                      <h2 className="mb-2 text-center text-lg font-semibold">{item.name}</h2>
-                      <p className="mb-4 text-center text-xs leading-relaxed text-gray-400">{item.description}</p>
-                      <p className="text-center font-medium text-orange-500">Rs. {item.price}/-</p>
+                      <h2 className="mb-2 text-center text-lg font-semibold">
+                        {item.name}
+                      </h2>
+                      <p className="mb-4 text-center text-xs leading-relaxed text-gray-400">
+                        {item.description}
+                      </p>
+                      <p className="text-center font-medium text-orange-500">
+                        Rs. {item.price}/-
+                      </p>
                     </button>
                   ))}
                 </section>
 
                 {items.length > 3 && (
-                  <section className="mx-auto max-w-sm px-2 sm:px-0" aria-label="Featured menu item">
+                  <section
+                    className="mx-auto max-w-sm px-2 sm:px-0"
+                    aria-label="Featured menu item"
+                  >
                     <button
                       type="button"
                       onClick={() => setSelectedItem(items[3])}
@@ -220,7 +245,11 @@ const MenuPage = () => {
                     >
                       <div className="relative mx-auto mb-4 aspect-square max-w-55 overflow-hidden rounded-full bg-gray-700">
                         <Image
-                          src={items[3].image ? `${API}/uploads/${items[3].image}` : "/placeholder.png"}
+                          src={
+                            items[3].image
+                              ? `${API}/uploads/${items[3].image}`
+                              : "/placeholder.png"
+                          }
                           alt={items[3].name}
                           fill
                           sizes="(max-width: 768px) 100vw, 400px"
@@ -228,9 +257,15 @@ const MenuPage = () => {
                         />
                       </div>
 
-                      <h2 className="mb-2 text-center text-lg font-semibold">{items[3].name}</h2>
-                      <p className="mb-4 text-center text-xs leading-relaxed text-gray-400">{items[3].description}</p>
-                      <p className="text-center font-medium text-orange-500">Rs. {items[3].price}/-</p>
+                      <h2 className="mb-2 text-center text-lg font-semibold">
+                        {items[3].name}
+                      </h2>
+                      <p className="mb-4 text-center text-xs leading-relaxed text-gray-400">
+                        {items[3].description}
+                      </p>
+                      <p className="text-center font-medium text-orange-500">
+                        Rs. {items[3].price}/-
+                      </p>
                     </button>
                   </section>
                 )}
@@ -261,7 +296,11 @@ const MenuPage = () => {
 
                 <div className="relative mb-4 aspect-square overflow-hidden rounded-lg bg-gray-700">
                   <Image
-                    src={selectedItem.image ? `${API}/uploads/${selectedItem.image}` : "/placeholder.png"}
+                    src={
+                      selectedItem.image
+                        ? `${API}/uploads/${selectedItem.image}`
+                        : "/placeholder.png"
+                    }
                     alt={selectedItem.name}
                     fill
                     sizes="(max-width: 768px) 100vw, 512px"
@@ -269,9 +308,15 @@ const MenuPage = () => {
                   />
                 </div>
 
-                <h2 className="mb-2 text-center text-xl font-semibold">{selectedItem.name}</h2>
-                <p className="mb-4 text-center text-sm text-gray-400">{selectedItem.description}</p>
-                <p className="text-center text-lg font-medium text-orange-500">Rs. {selectedItem.price}/-</p>
+                <h2 className="mb-2 text-center text-xl font-semibold">
+                  {selectedItem.name}
+                </h2>
+                <p className="mb-4 text-center text-sm text-gray-400">
+                  {selectedItem.description}
+                </p>
+                <p className="text-center text-lg font-medium text-orange-500">
+                  Rs. {selectedItem.price}/-
+                </p>
               </div>
             </div>
           )}

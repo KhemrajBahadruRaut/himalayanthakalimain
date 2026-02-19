@@ -22,8 +22,6 @@ export default function HimalayantThakaliAbout() {
   return (
     <div className="min-h-screen bg-[#1E1E1E] text-white overflow-hidden">
       <style jsx global>{`
-        @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Montserrat:wght@300;400;500&display=swap");
-
         @keyframes fadeInUp {
           from {
             opacity: 0;
@@ -159,10 +157,9 @@ export default function HimalayantThakaliAbout() {
           <div className="inline-flex items-center gap-4 mb-6">
             <div className="h-px  md:w-56 bg-linear-to-r from-transparent to-[#D97634]" />
             <span
-              className="text-[#D97634] text-sm tracking-[0.3em] font-light"
-              style={{ fontFamily: "Montserrat, sans-serif" }}
+              className="text-[#D97634] text-sm tracking-[0.2em] font-light"
             >
-              ✧ OUR STORY ✧
+              ✧ OUR STORY 
             </span>
             <div className="h-px  md:w-56 bg-linear-to-l from-transparent to-[#D97634]" />
           </div>

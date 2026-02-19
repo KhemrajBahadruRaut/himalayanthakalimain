@@ -109,9 +109,13 @@ export default function ThakaliGallery() {
 
           <header className="mb-10 text-center">
             <div className="mb-5 flex items-center justify-center gap-3 text-sm font-medium tracking-[0.125rem] text-[#D97634] uppercase animate-fadeInDown">
-              <div className="h-px w-50 bg-linear-to-r from-transparent to-[#D97634]" />
-              <span>Our Gallery</span>
-              <div className="h-px w-50 bg-linear-to-l from-transparent to-[#D97634]" />
+              <div className="h-px  md:w-56 bg-linear-to-r from-transparent to-[#D97634]" />
+            <span
+              className="text-[#D97634] text-sm tracking-[0.2em] font-light"
+            >
+             OUR gallery
+            </span>
+            <div className="h-px  md:w-56 bg-linear-to-l from-transparent to-[#D97634]" />
             </div>
 
             <h1 className="animate-fadeInUp text-[52px] font-semibold" style={{ fontFamily: "'Cormorant Garamond', serif" }}>

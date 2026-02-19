@@ -1,20 +1,18 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
-import { Geist, Geist_Mono } from "next/font/google";
 import { ToastProvider } from "@/components/providers/ToastProvider";
+import { Inter } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
   subsets: ["latin"],
+  variable: "--font-inter",
+    weight: ["300", "400", "500", "600", "700", "800"], 
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://himalayanthakali.com";
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL || "https://himalayanthakali.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -85,8 +83,12 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className="scroll-smooth" data-scroll-behavior="smooth">
-      <body className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased bg-white text-slate-900`}>
+    <html
+      lang="en"
+      className={`${inter.variable} scroll-smooth`}
+      data-scroll-behavior="smooth"
+    >
+      <body className=" font-inter antialiased bg-white text-slate-900">
         <ToastProvider>
           <a href="#main-content" className="skip-link">
             Skip to main content

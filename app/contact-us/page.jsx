@@ -155,13 +155,13 @@ export default function ContactPage() {
           )}
 
           <header className="mb-12 text-center">
-            <div className="mb-4 flex items-center justify-center gap-3">
-              <div className="h-px w-50 bg-linear-to-r from-transparent to-[#D97634]" />
-              <div className="flex items-center gap-2 text-sm font-medium text-[#D97634]">
+            <div className="inline-flex items-center gap-4 mb-6">
+              <div className="h-px  md:w-56 bg-linear-to-r from-transparent to-[#D97634]" />
+              <span className="text-[#D97634] text-sm flex gap-2 items-center tracking-[0.2em] font-light">
                 <Phone className="h-4 w-4" aria-hidden="true" />
-                <span>CONTACT US</span>
-              </div>
-              <div className="h-px w-50 bg-linear-to-l from-transparent to-[#D97634]" />
+                OUR STORY
+              </span>
+              <div className="h-px  md:w-56 bg-linear-to-l from-transparent to-[#D97634]" />
             </div>
 
             <h1 className="mb-4 text-4xl font-bold text-white md:text-5xl">
