@@ -326,8 +326,8 @@ export default function ContactPage() {
                 </div>
                 <h2 className="mb-2 font-semibold text-white">Contact Us</h2>
                 <div className="space-y-1 text-[#D97634]">
-                  <a href="tel:+9770000000000" className="hover:underline">
-                    +977 0000000000
+                  <a href="tel:+985-1158465" className="hover:underline">
+                    +977 9851158465
                   </a>
                 </div>
               </div>
