@@ -308,8 +308,28 @@ export default function ContactPage() {
                 <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#D97634]">
                   <MapPin className="h-8 w-8 text-white" aria-hidden="true" />
                 </div>
+
                 <h2 className="mb-2 font-semibold text-white">Visit Us</h2>
-                <p className="text-[#D97634]">Mid Baneshwor, Kathmandu</p>
+
+                <a
+                  href="https://www.google.com/maps/place/Himalayan+Thakali/@27.6977073,85.336217,18.19z/data=!4m10!1m2!2m1!1shimalayan+thakali!3m6!1s0x39eb190004c5e613:0x578e51ca713cfc9f!8m2!3d27.6977817!4d85.3378755!15sChFoaW1hbGF5YW4gdGhha2FsaVoTIhFoaW1hbGF5YW4gdGhha2FsaZIBEWZhbWlseV9yZXN0YXVyYW50mgFEQ2k5RFFVbFJRVU52WkVOb2RIbGpSamx2VDJ0S2JsWnRWbGxOYXpWRFZFaE9VbFF6UmtaTmJXeHpWbFZhYVdSdVl4QULgAQD6AQQIABAr!16s%2Fg%2F11yg097pvk?entry=ttu&g_ep=EgoyMDI2MDIxNi4wIKXMDSoASAFQAw%3D%3D"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#D97634] hover:underline"
+                >
+                  Mid Baneshwor, Kathmandu
+                </a>
+
+                <div className="mt-2">
+                  <a
+                    href="https://www.google.com/maps/place/Himalayan+Thakali/@27.6977073,85.336217,18.19z/data=!4m10!1m2!2m1!1shimalayan+thakali!3m6!1s0x39eb190004c5e613:0x578e51ca713cfc9f!8m2!3d27.6977817!4d85.3378755!15sChFoaW1hbGF5YW4gdGhha2FsaVoTIhFoaW1hbGF5YW4gdGhha2FsaZIBEWZhbWlseV9yZXN0YXVyYW50mgFEQ2k5RFFVbFJRVU52WkVOb2RIbGpSamx2VDJ0S2JsWnRWbGxOYXpWRFZFaE9VbFF6UmtaTmJXeHpWbFZhYVdSdVl4QULgAQD6AQQIABAr!16s%2Fg%2F11yg097pvk?entry=ttu&g_ep=EgoyMDI2MDIxNi4wIKXMDSoASAFQAw%3D%3D"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-zinc-400 hover:text-[#D97634] transition-colors"
+                  >
+                    Follow on Maps →
+                  </a>
+                </div>
               </div>
 
               <div className="rounded-lg bg-zinc-800 p-3 text-center">
