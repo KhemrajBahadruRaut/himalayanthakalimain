@@ -2,15 +2,21 @@
 
 import { useState } from "react";
 import dynamic from "next/dynamic";
-import { MapPin, Clock, Phone } from "lucide-react";
+import { MapPin, Clock, Phone, X } from "lucide-react";
 
-const Navbar = dynamic(() => import("../../components/layout/navbar/Navbar.jsx"), {
-  loading: () => <div className="h-24" />,
-});
+const Navbar = dynamic(
+  () => import("../../components/layout/navbar/Navbar.jsx"),
+  {
+    loading: () => <div className="h-24" />,
+  },
+);
 
-const Footer = dynamic(() => import("../../components/layout/footer/Footer.jsx"), {
-  loading: () => <div className="h-40" />,
-});
+const Footer = dynamic(
+  () => import("../../components/layout/footer/Footer.jsx"),
+  {
+    loading: () => <div className="h-40" />,
+  },
+);
 
 const CONTACT_API =
   // `${process.env.NEXT_PUBLIC_API_BASE || "http://localhost/himalayanthakali_backend"}/contacts/submit-contact.php`;
@@ -24,15 +30,55 @@ export default function ContactPage() {
     message: "",
   });
   const [submitState, setSubmitState] = useState({ type: "idle", message: "" });
+  const [toast, setToast] = useState({
+    visible: false,
+    message: "",
+    type: "info",
+  });
+
+  const showToast = (message, type = "info", duration = 93000) => {
+    setToast({ visible: true, message, type });
+    setTimeout(
+      () => setToast({ visible: false, message: "", type: "info" }),
+      duration,
+    );
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
     setFormData((prev) => ({ ...prev, [name]: value }));
+
+    if (name === "fullName") {
+      setValidation((prev) => ({
+        ...prev,
+        fullName: nameRegex.test(value),
+      }));
+    }
+
+    if (name === "email") {
+      setValidation((prev) => ({
+        ...prev,
+        email: emailRegex.test(value),
+      }));
+    }
+
+    if (name === "phoneNo") {
+      setValidation((prev) => ({
+        ...prev,
+        phoneNo: phoneRegex.test(value),
+      }));
+    }
   };
 
   const handleSubmit = async (e) => {
+    if (!validation.fullName || !validation.email || !validation.phoneNo) {
+      showToast("Please correct the highlighted fields.", "error");
+      return;
+    }
+
     e.preventDefault();
-    setSubmitState({ type: "idle", message: "" });
+    setSubmitState({ type: "loading", message: "" });
 
     try {
       const res = await fetch(CONTACT_API, {
@@ -43,27 +89,71 @@ export default function ContactPage() {
 
       if (!res.ok) throw new Error("Failed to submit form");
 
-      setSubmitState({ type: "success", message: "Message sent successfully." });
+      showToast("Message sent successfully!", "success");
+      setSubmitState({
+        type: "success",
+        message: "",
+      });
       setFormData({
         fullName: "",
         email: "",
         phoneNo: "",
         message: "",
       });
+      setValidation({
+        fullName: null,
+        email: null,
+        phoneNo: null,
+      });
     } catch (error) {
       console.error("Contact form submission failed:", error);
+      showToast("Could not send your message. Please try again.", "error");
       setSubmitState({
         type: "error",
-        message: "Could not send your message. Please try again.",
+        message: "",
       });
     }
   };
+  const nameRegex = /^[A-Za-z][A-Za-z0-9\s]*$/;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const phoneRegex = /^(98|97|96)\d{8}$/;
+
+  const [validation, setValidation] = useState({
+    fullName: null,
+    email: null,
+    phoneNo: null,
+  });
 
   return (
     <>
       <Navbar />
       <div className="bg-[#1E1E1E] px-4 pt-30 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl pb-10">
+          {/* Toast Notification */}
+          {toast.visible && (
+            <div
+              className={`fixed top-4 right-4 z-50 max-w-sm rounded border p-3 shadow-lg animate-in fade-in slide-in-from-top-2 duration-300 ${
+                toast.type === "success"
+                  ? "border-green-300 bg-emerald-50 text-green-600"
+                  : toast.type === "error"
+                    ? "border-rose-200 bg-rose-50 text-rose-800"
+                    : "border-slate-200 bg-white text-slate-800"
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-medium">{toast.message}</p>
+                <button
+                  onClick={() =>
+                    setToast({ visible: false, message: "", type: "info" })
+                  }
+                  className="ml-2 inline-flex shrink-0 text-gray-500 hover:text-gray-700"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
+          )}
+
           <header className="mb-12 text-center">
             <div className="mb-4 flex items-center justify-center gap-3">
               <div className="h-px w-50 bg-linear-to-r from-transparent to-orange-500" />
@@ -74,16 +164,23 @@ export default function ContactPage() {
               <div className="h-px w-50 bg-linear-to-l from-transparent to-orange-500" />
             </div>
 
-            <h1 className="mb-4 text-4xl font-bold text-white md:text-5xl">Get in Touch</h1>
+            <h1 className="mb-4 text-4xl font-bold text-white md:text-5xl">
+              Get in Touch
+            </h1>
 
             <p className="mx-auto max-w-2xl leading-relaxed text-gray-400">
-              Share your questions or feedback and our team will get back to you soon.
+              Share your questions or feedback and our team will get back to you
+              soon.
             </p>
           </header>
 
           <div className="grid items-start gap-20 md:grid-cols-2">
             <div className="order-2 md:order-1">
-              <form onSubmit={handleSubmit} className="space-y-6" aria-label="Contact form">
+              <form
+                onSubmit={handleSubmit}
+                className="space-y-6"
+                aria-label="Contact form"
+              >
                 <div className="relative">
                   <fieldset className="group rounded-lg border border-zinc-600 px-2.5 py-1 transition-all focus-within:border-dashed focus-within:border-orange-500">
                     <legend className="px-2 text-xs tracking-wider text-orange-500 uppercase">
@@ -99,6 +196,15 @@ export default function ContactPage() {
                       required
                     />
                   </fieldset>
+                  {validation.fullName !== null && (
+                    <p
+                      className={`text-[12px] pl-4  ${validation.fullName ? "text-green-400" : "text-red-400"}`}
+                    >
+                      {validation.fullName
+                        ? "Valid name"
+                        : "Must start with a letter and contain only letters or numbers."}
+                    </p>
+                  )}
                 </div>
 
                 <div className="relative">
@@ -116,6 +222,15 @@ export default function ContactPage() {
                       required
                     />
                   </fieldset>
+                  {validation.email !== null && (
+                    <p
+                      className={`text-[12px] pl-4  ${validation.email ? "text-green-400" : "text-red-400"}`}
+                    >
+                      {validation.email
+                        ? "Valid email address"
+                        : "Invalid email format"}
+                    </p>
+                  )}
                 </div>
 
                 <div className="relative">
@@ -134,6 +249,15 @@ export default function ContactPage() {
                       required
                     />
                   </fieldset>
+                  {validation.phoneNo !== null && (
+                    <p
+                      className={`text-[12px] pl-4  ${validation.phoneNo ? "text-green-400" : "text-red-400"}`}
+                    >
+                      {validation.phoneNo
+                        ? "Valid phone number"
+                        : "Must start with 98, 97, or 96 and be exactly 10 digits"}
+                    </p>
+                  )}
                 </div>
 
                 <div className="relative">
@@ -156,9 +280,12 @@ export default function ContactPage() {
                 <div className="flex justify-center">
                   <button
                     type="submit"
-                    className="rounded-md bg-orange-500 px-8 py-3 text-sm font-semibold tracking-wider text-black uppercase transition-colors duration-200 hover:bg-orange-600"
+                    disabled={submitState.type === "loading"}
+                    className="rounded-md bg-orange-500 px-8 py-3 text-sm font-semibold tracking-wider text-black uppercase transition-colors duration-200 hover:bg-orange-600 disabled:bg-orange-400 disabled:cursor-not-allowed"
                   >
-                    Send Message
+                    {submitState.type === "loading"
+                      ? "Sending..."
+                      : "Send Message"}
                   </button>
                 </div>
 
@@ -166,7 +293,9 @@ export default function ContactPage() {
                   role="status"
                   aria-live="polite"
                   className={`text-center text-sm ${
-                    submitState.type === "success" ? "text-green-400" : "text-red-400"
+                    submitState.type === "success"
+                      ? "text-green-400"
+                      : "text-red-400"
                   }`}
                 >
                   {submitState.message}
