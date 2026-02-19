@@ -27,6 +27,7 @@ export default function GalleryAdmin() {
   const [categories, setCategories] = useState([]);
   const [activeCategory, setActiveCategory] = useState(null);
   const [gallery, setGallery] = useState([]);
+  const [allGalleryImages, setAllGalleryImages] = useState([]); // All images across all categories
   const [newCategory, setNewCategory] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -42,6 +43,7 @@ export default function GalleryAdmin() {
     span: "normal",
     image: null,
   });
+  const [uploadType, setUploadType] = useState("normal"); // "large" or "normal"
   const { showToast, showConfirm } = useToast();
 
   const fetchGallery = useCallback(
@@ -55,7 +57,12 @@ export default function GalleryAdmin() {
       try {
         const res = await fetch(`${API}/get_gallery.php?category_id=${categoryId}`);
         const data = await res.json();
-        setGallery(Array.isArray(data.data) ? data.data : []);
+        // Only store category-specific images (normal images only)
+        const categoryGallery = Array.isArray(data.data) 
+          ? data.data.filter((img) => img.span !== "large") 
+          : [];
+        
+        setGallery(categoryGallery);
       } catch (error) {
         console.error("Failed to fetch gallery:", error);
         setGallery([]);
@@ -80,6 +87,21 @@ export default function GalleryAdmin() {
         const data = await res.json();
         const safeCategories = Array.isArray(data) ? data : [];
         setCategories(safeCategories);
+
+        // Fetch all gallery images to count total large images
+        try {
+          let allImages = [];
+          for (const category of safeCategories) {
+            const galleryRes = await fetch(`${API}/get_gallery.php?category_id=${category.id}`);
+            const galleryData = await galleryRes.json();
+            if (Array.isArray(galleryData.data)) {
+              allImages = [...allImages, ...galleryData.data];
+            }
+          }
+          setAllGalleryImages(allImages);
+        } catch (err) {
+          console.error("Failed to fetch all gallery images:", err);
+        }
 
         if (safeCategories.length === 0) {
           setActiveCategory(null);
@@ -218,7 +240,9 @@ export default function GalleryAdmin() {
         return;
       }
 
-      await fetchGallery(activeCategory);
+      // Update state directly without refetching to prevent blinking
+      setAllGalleryImages((prev) => prev.filter((img) => img.id !== id));
+      setGallery((prev) => prev.filter((img) => img.id !== id));
       showToast(data?.message || "Image deleted.", "success");
     } catch (error) {
       console.error("Error deleting image:", error);
@@ -242,7 +266,7 @@ export default function GalleryAdmin() {
     const formData = new FormData();
     formData.append("category_id", activeCategory);
     formData.append("alt_text", form.alt_text);
-    formData.append("span", form.span);
+    formData.append("span", uploadType); // Use uploadType instead of form.span
     if (form.image) formData.append("image", form.image);
 
     const endpoint = form.id ? "update_gallery.php" : "add_gallery.php";
@@ -262,8 +286,29 @@ export default function GalleryAdmin() {
 
       setEditingImagePath("");
       setForm({ id: null, alt_text: "", span: "normal", image: null });
-      await fetchGallery(activeCategory);
-      showToast(data?.message || (form.id ? "Image updated." : "Image uploaded."), "success");
+      setUploadType("normal");
+      
+      // Fetch only the current category images to update gallery
+      const galleryRes = await fetch(`${API}/get_gallery.php?category_id=${activeCategory}`);
+      const galleryData = await galleryRes.json();
+      const categoryImages = Array.isArray(galleryData.data) 
+        ? galleryData.data.filter((img) => img.span !== "large")
+        : [];
+      setGallery(categoryImages);
+      
+      // Update allGalleryImages with new large images if any
+      if (uploadType === "large") {
+        const newLargeImages = Array.isArray(galleryData.data)
+          ? galleryData.data.filter((img) => img.span === "large")
+          : [];
+        setAllGalleryImages((prev) => {
+          const existingLargeIds = prev.filter((img) => img.span === "large").map((img) => img.id);
+          const uniqueNewLarge = newLargeImages.filter((img) => !existingLargeIds.includes(img.id));
+          return [...prev, ...uniqueNewLarge];
+        });
+      }
+      
+      showToast(galleryData.message || (form.id ? "Image updated." : "Image uploaded."), "success");
     } catch (error) {
       console.error("Failed to save image:", error);
       showToast("Failed to save image.", "error");
@@ -272,18 +317,28 @@ export default function GalleryAdmin() {
     }
   };
 
-  const filteredGallery = useMemo(() => {
-    const query = searchTerm.trim().toLowerCase();
-    if (!query) return gallery;
-    return gallery.filter((image) =>
-      (image.alt_text || "").toLowerCase().includes(query)
-    );
-  }, [gallery, searchTerm]);
   const galleryPreviewUrl = useMemo(() => {
     if (selectedImagePreviewUrl) return selectedImagePreviewUrl;
     if (form.id && editingImagePath) return getImageUrl(editingImagePath);
     return "";
   }, [selectedImagePreviewUrl, form.id, editingImagePath]);
+
+  const largeImages = useMemo(() => {
+    return allGalleryImages.filter((img) => img.span === "large");
+  }, [allGalleryImages]);
+
+  const normalImages = useMemo(() => {
+    const query = searchTerm.trim().toLowerCase();
+    // gallery already contains only normal images from fetchGallery
+    if (!query) return gallery;
+    return normal.filter((image) =>
+      (image.alt_text || "").toLowerCase().includes(query)
+    );
+  }, [gallery, searchTerm]);
+
+  const largeImageCount = useMemo(() => {
+    return allGalleryImages.filter((img) => img.span === "large").length;
+  }, [allGalleryImages]);
 
   return (
     <div className="mx-auto max-w-7xl space-y-6">
@@ -315,12 +370,12 @@ export default function GalleryAdmin() {
             <p className="mt-2 text-2xl font-bold text-slate-900">{categories.length}</p>
           </div>
           <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
-            <p className="text-xs font-semibold uppercase text-slate-500">Images In Category</p>
-            <p className="mt-2 text-2xl font-bold text-slate-900">{gallery.length}</p>
+            <p className="text-xs font-semibold uppercase text-slate-500">Large Featured</p>
+            <p className="mt-2 text-2xl font-bold text-slate-900">{largeImageCount}/2</p>
           </div>
           <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
-            <p className="text-xs font-semibold uppercase text-slate-500">Filtered Results</p>
-            <p className="mt-2 text-2xl font-bold text-slate-900">{filteredGallery.length}</p>
+            <p className="text-xs font-semibold uppercase text-slate-500">Normal Images</p>
+            <p className="mt-2 text-2xl font-bold text-slate-900">{gallery.filter((img) => img.span !== "large").length}</p>
           </div>
         </div>
       </section>
@@ -436,14 +491,36 @@ export default function GalleryAdmin() {
                     placeholder="Image label / alt text"
                   />
 
-                  <select
-                    value={form.span}
-                    onChange={(e) => setForm({ ...form, span: e.target.value })}
-                    className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm outline-none transition focus:border-[#E9842C] focus:bg-white"
-                  >
-                    <option value="normal">Normal</option>
-                    <option value="large">Large</option>
-                  </select>
+                  {!form.id && (
+                    <div className="space-y-2">
+                      <label className="text-xs font-semibold text-slate-700">Image Type</label>
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setUploadType("large")}
+                          disabled={largeImageCount >= 2}
+                          className={`flex-1 rounded-lg px-3 py-2 text-sm font-semibold transition ${
+                            uploadType === "large"
+                              ? "bg-[#E9842C] text-white"
+                              : "border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100"
+                          } ${largeImageCount >= 2 ? "opacity-50 cursor-not-allowed" : ""}`}
+                        >
+                          Large ({largeImageCount}/2)
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setUploadType("normal")}
+                          className={`flex-1 rounded-lg px-3 py-2 text-sm font-semibold transition ${
+                            uploadType === "normal"
+                              ? "bg-[#E9842C] text-white"
+                              : "border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100"
+                          }`}
+                        >
+                          Normal
+                        </button>
+                      </div>
+                    </div>
+                  )}
 
                   <div className="md:col-span-2 flex items-center gap-3 rounded-xl border border-dashed border-slate-300 bg-slate-50 p-3">
                     <ImageIcon className="h-4 w-4 text-slate-400" />
@@ -492,8 +569,67 @@ export default function GalleryAdmin() {
               </section>
 
               <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <h2 className="mb-4 text-lg font-bold text-slate-900">Featured Images (Large - Top Section)</h2>
+
+                {isGalleryLoading ? (
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    {Array.from({ length: 2 }).map((_, index) => (
+                      <div key={`large-skeleton-${index}`} className="rounded-2xl border border-slate-200 p-2">
+                        <Skeleton className="h-64 w-full" />
+                      </div>
+                    ))}
+                  </div>
+                ) : largeImages.length === 0 ? (
+                  <div className="rounded-xl border border-dashed border-slate-300 py-12 text-center text-sm text-slate-500">
+                    No featured images yet. Upload up to 2 large images.
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    {largeImages.map((image) => (
+                      <div
+                        key={image.id}
+                        className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white"
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={getImageUrl(image.image_path)}
+                          className="h-64 w-full object-cover transition duration-500 group-hover:scale-105"
+                          alt={image.alt_text || "Gallery image"}
+                          loading="lazy"
+                          decoding="async"
+                        />
+
+                        <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-2 bg-linear-to-t from-black/90 via-black/30 to-transparent p-3">
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-semibold text-white">
+                              {image.alt_text || "Untitled image"}
+                            </p>
+                            <p className="text-xs text-white/75">Large</p>
+                          </div>
+                          <div className="flex shrink-0 items-center gap-2">
+                            <button
+                              onClick={() => handleEditImage(image)}
+                              className="rounded-lg bg-white/20 p-2 text-white transition hover:bg-white hover:text-slate-900"
+                            >
+                              <Edit3 className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={() => deleteImage(image.id)}
+                              className="rounded-lg bg-red-500/90 p-2 text-white transition hover:bg-red-600"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </section>
+
+              <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                 <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                  <h2 className="text-lg font-bold text-slate-900">Images</h2>
+                  <h2 className="text-lg font-bold text-slate-900">Images (Normal - Bottom Section)</h2>
                   <div className="relative w-full md:w-80">
                     <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                     <input
@@ -509,20 +645,20 @@ export default function GalleryAdmin() {
                 {isGalleryLoading ? (
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {Array.from({ length: 6 }).map((_, index) => (
-                      <div key={`gallery-item-skeleton-${index}`} className="rounded-2xl border border-slate-200 p-2">
+                      <div key={`normal-skeleton-${index}`} className="rounded-2xl border border-slate-200 p-2">
                         <Skeleton className="h-56 w-full" />
                       </div>
                     ))}
                   </div>
-                ) : filteredGallery.length === 0 ? (
+                ) : normalImages.length === 0 ? (
                   <div className="rounded-xl border border-dashed border-slate-300 py-16 text-center text-sm text-slate-500">
-                    {gallery.length === 0
-                      ? "No images found in this category."
+                    {gallery.filter((img) => img.span !== "large").length === 0
+                      ? "No normal images found in this category."
                       : "No images match your search."}
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    {filteredGallery.map((image) => (
+                    {normalImages.map((image) => (
                       <div
                         key={image.id}
                         className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white"
@@ -541,7 +677,7 @@ export default function GalleryAdmin() {
                             <p className="truncate text-sm font-semibold text-white">
                               {image.alt_text || "Untitled image"}
                             </p>
-                            <p className="text-xs text-white/75">{image.span || "normal"}</p>
+                            <p className="text-xs text-white/75">Normal</p>
                           </div>
                           <div className="flex shrink-0 items-center gap-2">
                             <button

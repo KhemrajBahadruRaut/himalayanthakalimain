@@ -88,6 +88,10 @@ export default function ThakaliGallery() {
       ? galleryImages
       : galleryImages.filter((image) => image.category_name === activeFilter);
 
+  // Separate large and normal images
+  const largeImages = filteredImages.filter((img) => img.span === "large");
+  const normalImages = filteredImages.filter((img) => img.span !== "large");
+
   return (
     <>
       <div className="bg-[#1E1E1E] text-white">
@@ -104,10 +108,10 @@ export default function ThakaliGallery() {
           .animate-scaleIn { animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
         `}</style>
 
-        <div className="mx-auto px-10 pt-30">
+        <div className="mx-auto px-4 sm:px-10 pt-30">
           <Navbar />
 
-          <header className="mb-10 text-center">
+          <header className="mb-6 sm:mb-10 text-center">
             <div className="mb-5 flex items-center justify-center gap-3 text-sm font-medium tracking-[0.125rem] text-[#D97634] uppercase animate-fadeInDown">
               <div className="h-px  md:w-56 bg-linear-to-r from-transparent to-[#D97634]" />
             <span
@@ -118,11 +122,11 @@ export default function ThakaliGallery() {
             <div className="h-px  md:w-56 bg-linear-to-l from-transparent to-[#D97634]" />
             </div>
 
-            <h1 className="animate-fadeInUp text-[52px] font-semibold" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+            <h1 className="animate-fadeInUp text-3xl sm:text-4xl lg:text-[52px] font-semibold" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
               Inside Himalayan <span className="text-[#D97634]">Thakali</span>
             </h1>
 
-            <p className="animate-fadeInUp-delayed mx-auto max-w-150 text-base leading-relaxed text-[#999]">
+            <p className="animate-fadeInUp-delayed mx-auto max-w-150 text-sm sm:text-base leading-relaxed text-[#999]">
               Experience our authentic ambiance, cuisine and cultural moments.
             </p>
           </header>
@@ -130,13 +134,13 @@ export default function ThakaliGallery() {
           {isLoading ? (
             <GalleryFiltersSkeleton />
           ) : (
-            <div className="animate-fadeIn mb-16 flex flex-wrap justify-center gap-4">
+            <div className="animate-fadeIn mb-8 sm:mb-16 flex flex-wrap justify-center gap-2 sm:gap-4">
               {filters.map((filter, index) => (
                 <button
                   key={`${filter}-${index}`}
                   type="button"
                   onClick={() => setActiveFilter(filter)}
-                  className={`group relative overflow-hidden rounded px-8 py-3 text-sm font-medium capitalize transition-all duration-200 ${
+                  className={`group relative overflow-hidden rounded px-4 sm:px-8 py-2 sm:py-3 text-xs sm:text-sm font-medium capitalize transition-all duration-200 ${
                     activeFilter === filter
                       ? "bg-[#D97634] text-white"
                       : "border border-[#D97634] bg-transparent text-[#D97634]"
@@ -156,19 +160,43 @@ export default function ThakaliGallery() {
             {isLoading ? (
               <GalleryGridSkeleton />
             ) : (
-              <div className="grid grid-cols-1 gap-8 sm:p-10 md:grid-cols-2 lg:grid-cols-6">
-                {filteredImages.map((image, index) => (
+              <div className="grid grid-cols-1 gap-3 sm:gap-6 lg:gap-8 p-4 sm:p-10 md:grid-cols-2 lg:grid-cols-6">
+                {/* Large Images Section - Top 2 */}
+                {largeImages.slice(0, 2).map((image, index) => (
                   <button
                     key={image.id}
                     type="button"
                     onClick={() => setSelectedImg(image)}
                     style={{ animationDelay: `${index * 0.05}s` }}
                     aria-label={`Open image preview: ${image.alt_text || "Gallery image"}`}
-                    className={`gallery-item group relative cursor-pointer overflow-hidden rounded-lg transition-transform duration-300 hover:-translate-y-1 animate-scaleIn ${
-                      index < 2 ? "md:col-span-1 lg:col-span-3" : "md:col-span-1 lg:col-span-2"
-                    }`}
+                    className="gallery-item group relative cursor-pointer overflow-hidden rounded-lg transition-transform duration-300 hover:-translate-y-1 animate-scaleIn md:col-span-1 lg:col-span-3"
                   >
-                    <div className={`relative w-full ${image.span === "large" ? "h-87.5" : "h-62.5"}`}>
+                    <div className="relative w-full h-48 sm:h-64 lg:h-87.5">
+                      <Image
+                        src={`${API}/${image.image_path}`}
+                        alt={image.alt_text || "Gallery image"}
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        className="absolute inset-0 h-full w-full object-contain transition-transform duration-500 group-hover:scale-105"
+                      />
+                    </div>
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                      <ZoomIn className="h-8 w-8 scale-75 text-white transition-transform duration-200 group-hover:scale-100" aria-hidden="true" />
+                    </div>
+                  </button>
+                ))}
+
+                {/* Normal Images Section - Below */}
+                {normalImages.map((image, index) => (
+                  <button
+                    key={image.id}
+                    type="button"
+                    onClick={() => setSelectedImg(image)}
+                    style={{ animationDelay: `${(index + 2) * 0.05}s` }}
+                    aria-label={`Open image preview: ${image.alt_text || "Gallery image"}`}
+                    className="gallery-item group relative cursor-pointer overflow-hidden rounded-lg transition-transform duration-300 hover:-translate-y-1 animate-scaleIn md:col-span-1 lg:col-span-2"
+                  >
+                    <div className="relative w-full h-40 sm:h-56 lg:h-62.5">
                       <Image
                         src={`${API}/${image.image_path}`}
                         alt={image.alt_text || "Gallery image"}
