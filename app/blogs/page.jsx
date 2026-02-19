@@ -66,7 +66,7 @@ const BlogListingPage = () => {
   return (
     <>
       <Navbar />
-      <div className="bg-[#1E1E1E] px-4 pt-40 text-white">
+      <div className="bg-[#1E1E1E] px-4 pt-30 text-white">
         <div className="mx-auto max-w-7xl">
           <header className="mb-16 text-center">
             <div className="mb-4 flex items-center justify-center gap-2">

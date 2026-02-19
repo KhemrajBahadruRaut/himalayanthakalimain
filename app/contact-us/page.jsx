@@ -156,12 +156,12 @@ export default function ContactPage() {
 
           <header className="mb-12 text-center">
             <div className="mb-4 flex items-center justify-center gap-3">
-              <div className="h-px w-50 bg-linear-to-r from-transparent to-orange-500" />
-              <div className="flex items-center gap-2 text-sm font-medium text-orange-500">
+              <div className="h-px w-50 bg-linear-to-r from-transparent to-[#D97634]" />
+              <div className="flex items-center gap-2 text-sm font-medium text-[#D97634]">
                 <Phone className="h-4 w-4" aria-hidden="true" />
                 <span>CONTACT US</span>
               </div>
-              <div className="h-px w-50 bg-linear-to-l from-transparent to-orange-500" />
+              <div className="h-px w-50 bg-linear-to-l from-transparent to-[#D97634]" />
             </div>
 
             <h1 className="mb-4 text-4xl font-bold text-white md:text-5xl">
@@ -182,8 +182,8 @@ export default function ContactPage() {
                 aria-label="Contact form"
               >
                 <div className="relative">
-                  <fieldset className="group rounded-lg border border-zinc-600 px-2.5 py-1 transition-all focus-within:border-dashed focus-within:border-orange-500">
-                    <legend className="px-2 text-xs tracking-wider text-orange-500 uppercase">
+                  <fieldset className="group rounded-lg border border-zinc-600 px-2.5 py-1 transition-all focus-within:border-dashed focus-within:border-[#D97634]">
+                    <legend className="px-2 text-xs tracking-wider text-[#D97634] uppercase">
                       Full Name
                     </legend>
                     <input
@@ -208,7 +208,7 @@ export default function ContactPage() {
                 </div>
 
                 <div className="relative">
-                  <fieldset className="group rounded-lg border border-zinc-600 px-2.5 py-1 transition-all focus-within:border-dashed focus-within:border-orange-500">
+                  <fieldset className="group rounded-lg border border-zinc-600 px-2.5 py-1 transition-all focus-within:border-dashed focus-within:border-[#D97634]">
                     <legend className="px-2 text-xs tracking-wider text-gray-400 uppercase">
                       Email Address
                     </legend>
@@ -234,7 +234,7 @@ export default function ContactPage() {
                 </div>
 
                 <div className="relative">
-                  <fieldset className="group rounded-lg border border-zinc-600 px-2.5 py-1 transition-all focus-within:border-dashed focus-within:border-orange-500">
+                  <fieldset className="group rounded-lg border border-zinc-600 px-2.5 py-1 transition-all focus-within:border-dashed focus-within:border-[#D97634]">
                     <legend className="px-2 text-xs tracking-wider text-gray-400 uppercase">
                       Phone Number
                     </legend>
@@ -261,7 +261,7 @@ export default function ContactPage() {
                 </div>
 
                 <div className="relative">
-                  <fieldset className="group rounded-lg border border-zinc-600 px-2.5 py-1 transition-all focus-within:border-dashed focus-within:border-orange-500">
+                  <fieldset className="group rounded-lg border border-zinc-600 px-2.5 py-1 transition-all focus-within:border-dashed focus-within:border-[#D97634]">
                     <legend className="px-2 text-xs tracking-wider text-gray-400 uppercase">
                       Message
                     </legend>
@@ -281,7 +281,7 @@ export default function ContactPage() {
                   <button
                     type="submit"
                     disabled={submitState.type === "loading"}
-                    className="rounded-md bg-orange-500 px-8 py-3 text-sm font-semibold tracking-wider text-black uppercase transition-colors duration-200 hover:bg-orange-600 disabled:bg-orange-400 disabled:cursor-not-allowed"
+                    className="rounded-md bg-[#D97634] px-8 py-3 text-sm font-semibold tracking-wider text-black uppercase transition-colors duration-200 hover:bg-orange-600 disabled:bg-orange-400 disabled:cursor-not-allowed"
                   >
                     {submitState.type === "loading"
                       ? "Sending..."
@@ -305,27 +305,27 @@ export default function ContactPage() {
 
             <div className="order-1 space-y-4 md:order-2">
               <div className="rounded-lg bg-zinc-800 p-3 text-center">
-                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-orange-500">
+                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#D97634]">
                   <MapPin className="h-8 w-8 text-white" aria-hidden="true" />
                 </div>
                 <h2 className="mb-2 font-semibold text-white">Visit Us</h2>
-                <p className="text-orange-500">Mid Baneshwor, Kathmandu</p>
+                <p className="text-[#D97634]">Mid Baneshwor, Kathmandu</p>
               </div>
 
               <div className="rounded-lg bg-zinc-800 p-3 text-center">
-                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-orange-500">
+                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#D97634]">
                   <Clock className="h-8 w-8 text-white" aria-hidden="true" />
                 </div>
                 <h2 className="mb-2 font-semibold text-white">Opening Hours</h2>
-                <p className="text-orange-500">10:00 AM - 10:00 PM</p>
+                <p className="text-[#D97634]">10:00 AM - 10:00 PM</p>
               </div>
 
               <div className="rounded-lg bg-zinc-800 p-3 text-center">
-                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-orange-500">
+                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#D97634]">
                   <Phone className="h-8 w-8 text-white" aria-hidden="true" />
                 </div>
                 <h2 className="mb-2 font-semibold text-white">Contact Us</h2>
-                <div className="space-y-1 text-orange-500">
+                <div className="space-y-1 text-[#D97634]">
                   <a href="tel:+9770000000000" className="hover:underline">
                     +977 0000000000
                   </a>
