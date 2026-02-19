@@ -36,7 +36,7 @@ export default function ContactPage() {
     type: "info",
   });
 
-  const showToast = (message, type = "info", duration = 93000) => {
+  const showToast = (message, type = "info", duration = 3000) => {
     setToast({ visible: true, message, type });
     setTimeout(
       () => setToast({ visible: false, message: "", type: "info" }),
