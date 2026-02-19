@@ -125,7 +125,7 @@ const MenuPage = () => {
     <>
       <Navbar />
 
-      <div className="bg-[#1E1E1E] pt-30 text-white">
+      <div className="bg-[#1E1E1E] pt-5 sm:pt-30 text-white">
         <div className="flex flex-col lg:flex-row">
           <aside className="w-full border-b border-gray-800 p-4 pt-20 lg:w-64 lg:border-r lg:border-b-0">
             <h2 className="mb-4 text-center lg:mb-6 text-[#D97634] text-sm tracking-[0.3em] font-light">

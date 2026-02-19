@@ -127,12 +127,12 @@ export default function ContactPage() {
   return (
     <>
       <Navbar />
-      <div className="bg-[#1E1E1E] px-4 pt-30 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-4xl pb-10">
+      <div className="bg-[#1E1E1E] px-4 sm:px-6 lg:px-8 pt-30">
+        <div className="mx-auto max-w-4xl pb-6 sm:pb-8 md:pb-10">
           {/* Toast Notification */}
           {toast.visible && (
             <div
-              className={`fixed top-4 right-4 z-50 max-w-sm rounded border p-3 shadow-lg animate-in fade-in slide-in-from-top-2 duration-300 ${
+              className={`fixed top-4 right-4 z-50 max-w-xs sm:max-w-sm rounded border p-3 sm:p-4 shadow-lg animate-in fade-in slide-in-from-top-2 duration-300 text-xs sm:text-sm ${
                 toast.type === "success"
                   ? "border-green-300 bg-emerald-50 text-green-600"
                   : toast.type === "error"
@@ -154,31 +154,31 @@ export default function ContactPage() {
             </div>
           )}
 
-          <header className="mb-12 text-center">
-            <div className="inline-flex items-center gap-4 mb-6">
-              <div className="h-px  md:w-56 bg-linear-to-r from-transparent to-[#D97634]" />
-              <span className="text-[#D97634] text-sm flex gap-2 items-center tracking-[0.2em] font-light">
-                <Phone className="h-4 w-4" aria-hidden="true" />
+          <header className="mb-8 sm:mb-10 md:mb-12 text-center">
+            <div className="inline-flex items-center gap-2 sm:gap-4 mb-4 sm:mb-6">
+              <div className="h-px w-8 sm:w-20 md:w-56 bg-linear-to-r from-transparent to-[#D97634]" />
+              <span className="text-[#D97634] text-xs sm:text-sm flex gap-2 items-center tracking-[0.2em] font-light whitespace-nowrap">
+                <Phone className="h-3 w-3 sm:h-4 sm:w-4" aria-hidden="true" />
                 OUR STORY
               </span>
-              <div className="h-px  md:w-56 bg-linear-to-l from-transparent to-[#D97634]" />
+              <div className="h-px w-8 sm:w-20 md:w-56 bg-linear-to-l from-transparent to-[#D97634]" />
             </div>
 
-            <h1 className="mb-4 text-4xl font-bold text-white md:text-5xl">
+            <h1 className="mb-3 sm:mb-4 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white">
               Get in Touch
             </h1>
 
-            <p className="mx-auto max-w-2xl leading-relaxed text-gray-400">
+            <p className="mx-auto max-w-2xl leading-relaxed text-gray-400 text-xs sm:text-sm md:text-base">
               Share your questions or feedback and our team will get back to you
               soon.
             </p>
           </header>
 
-          <div className="grid items-start gap-20 md:grid-cols-2">
+          <div className="grid items-start gap-8 sm:gap-10 md:gap-12 lg:gap-20 md:grid-cols-2">
             <div className="order-2 md:order-1">
               <form
                 onSubmit={handleSubmit}
-                className="space-y-6"
+                className="space-y-4 sm:space-y-5 md:space-y-6"
                 aria-label="Contact form"
               >
                 <div className="relative">
@@ -198,7 +198,7 @@ export default function ContactPage() {
                   </fieldset>
                   {validation.fullName !== null && (
                     <p
-                      className={`text-[12px] pl-4  ${validation.fullName ? "text-green-400" : "text-red-400"}`}
+                      className={`text-[10px] sm:text-[12px] pl-4 ${validation.fullName ? "text-green-400" : "text-red-400"}`}
                     >
                       {validation.fullName
                         ? "Valid name"
@@ -224,7 +224,7 @@ export default function ContactPage() {
                   </fieldset>
                   {validation.email !== null && (
                     <p
-                      className={`text-[12px] pl-4  ${validation.email ? "text-green-400" : "text-red-400"}`}
+                      className={`text-[10px] sm:text-[12px] pl-4 ${validation.email ? "text-green-400" : "text-red-400"}`}
                     >
                       {validation.email
                         ? "Valid email address"
@@ -251,7 +251,7 @@ export default function ContactPage() {
                   </fieldset>
                   {validation.phoneNo !== null && (
                     <p
-                      className={`text-[12px] pl-4  ${validation.phoneNo ? "text-green-400" : "text-red-400"}`}
+                      className={`text-[10px] sm:text-[12px] pl-4 ${validation.phoneNo ? "text-green-400" : "text-red-400"}`}
                     >
                       {validation.phoneNo
                         ? "Valid phone number"
@@ -281,7 +281,7 @@ export default function ContactPage() {
                   <button
                     type="submit"
                     disabled={submitState.type === "loading"}
-                    className="rounded-md bg-[#D97634] px-8 py-3 text-sm font-semibold tracking-wider text-black uppercase transition-colors duration-200 hover:bg-orange-600 disabled:bg-orange-400 disabled:cursor-not-allowed"
+                    className="rounded-md bg-[#D97634] px-6 sm:px-8 py-2 sm:py-3 text-xs sm:text-sm font-semibold tracking-wider text-black uppercase transition-colors duration-200 hover:bg-orange-600 disabled:bg-orange-400 disabled:cursor-not-allowed"
                   >
                     {submitState.type === "loading"
                       ? "Sending..."
@@ -303,19 +303,19 @@ export default function ContactPage() {
               </form>
             </div>
 
-            <div className="order-1 space-y-4 md:order-2">
-              <div className="rounded-lg bg-zinc-800 p-3 text-center">
-                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#D97634]">
-                  <MapPin className="h-8 w-8 text-white" aria-hidden="true" />
+            <div className="order-1 space-y-3 sm:space-y-4 md:order-2">
+              <div className="rounded-lg bg-zinc-800 p-4 sm:p-5 md:p-6 text-center">
+                <div className="mx-auto mb-3 sm:mb-4 flex h-12 w-12 sm:h-16 sm:w-16 items-center justify-center rounded-full bg-[#D97634]">
+                  <MapPin className="h-6 w-6 sm:h-8 sm:w-8 text-white" aria-hidden="true" />
                 </div>
 
-                <h2 className="mb-2 font-semibold text-white">Visit Us</h2>
+                <h2 className="mb-2 sm:mb-3 font-semibold text-white text-sm sm:text-base">Visit Us</h2>
 
                 <a
                   href="https://www.google.com/maps/place/Himalayan+Thakali/@27.6977073,85.336217,18.19z/data=!4m10!1m2!2m1!1shimalayan+thakali!3m6!1s0x39eb190004c5e613:0x578e51ca713cfc9f!8m2!3d27.6977817!4d85.3378755!15sChFoaW1hbGF5YW4gdGhha2FsaVoTIhFoaW1hbGF5YW4gdGhha2FsaZIBEWZhbWlseV9yZXN0YXVyYW50mgFEQ2k5RFFVbFJRVU52WkVOb2RIbGpSamx2VDJ0S2JsWnRWbGxOYXpWRFZFaE9VbFF6UmtaTmJXeHpWbFZhYVdSdVl4QULgAQD6AQQIABAr!16s%2Fg%2F11yg097pvk?entry=ttu&g_ep=EgoyMDI2MDIxNi4wIKXMDSoASAFQAw%3D%3D"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[#D97634] hover:underline"
+                  className="text-[#D97634] hover:underline text-xs sm:text-sm"
                 >
                   Mid Baneshwor, Kathmandu
                 </a>
@@ -325,28 +325,28 @@ export default function ContactPage() {
                     href="https://www.google.com/maps/place/Himalayan+Thakali/@27.6977073,85.336217,18.19z/data=!4m10!1m2!2m1!1shimalayan+thakali!3m6!1s0x39eb190004c5e613:0x578e51ca713cfc9f!8m2!3d27.6977817!4d85.3378755!15sChFoaW1hbGF5YW4gdGhha2FsaVoTIhFoaW1hbGF5YW4gdGhha2FsaZIBEWZhbWlseV9yZXN0YXVyYW50mgFEQ2k5RFFVbFJRVU52WkVOb2RIbGpSamx2VDJ0S2JsWnRWbGxOYXpWRFZFaE9VbFF6UmtaTmJXeHpWbFZhYVdSdVl4QULgAQD6AQQIABAr!16s%2Fg%2F11yg097pvk?entry=ttu&g_ep=EgoyMDI2MDIxNi4wIKXMDSoASAFQAw%3D%3D"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs text-zinc-400 hover:text-[#D97634] transition-colors"
+                    className="text-[10px] sm:text-xs text-zinc-400 hover:text-[#D97634] transition-colors"
                   >
                     Follow on Maps →
                   </a>
                 </div>
               </div>
 
-              <div className="rounded-lg bg-zinc-800 p-3 text-center">
-                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#D97634]">
-                  <Clock className="h-8 w-8 text-white" aria-hidden="true" />
+              <div className="rounded-lg bg-zinc-800 p-4 sm:p-5 md:p-6 text-center">
+                <div className="mx-auto mb-3 sm:mb-4 flex h-12 w-12 sm:h-16 sm:w-16 items-center justify-center rounded-full bg-[#D97634]">
+                  <Clock className="h-6 w-6 sm:h-8 sm:w-8 text-white" aria-hidden="true" />
                 </div>
-                <h2 className="mb-2 font-semibold text-white">Opening Hours</h2>
-                <p className="text-[#D97634]">10:00 AM - 10:00 PM</p>
+                <h2 className="mb-2 sm:mb-3 font-semibold text-white text-sm sm:text-base">Opening Hours</h2>
+                <p className="text-[#D97634] text-xs sm:text-sm">10:00 AM - 10:00 PM</p>
               </div>
 
-              <div className="rounded-lg bg-zinc-800 p-3 text-center">
-                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#D97634]">
-                  <Phone className="h-8 w-8 text-white" aria-hidden="true" />
+              <div className="rounded-lg bg-zinc-800 p-4 sm:p-5 md:p-6 text-center">
+                <div className="mx-auto mb-3 sm:mb-4 flex h-12 w-12 sm:h-16 sm:w-16 items-center justify-center rounded-full bg-[#D97634]">
+                  <Phone className="h-6 w-6 sm:h-8 sm:w-8 text-white" aria-hidden="true" />
                 </div>
-                <h2 className="mb-2 font-semibold text-white">Contact Us</h2>
+                <h2 className="mb-2 sm:mb-3 font-semibold text-white text-sm sm:text-base">Contact Us</h2>
                 <div className="space-y-1 text-[#D97634]">
-                  <a href="tel:+985-1158465" className="hover:underline">
+                  <a href="tel:+985-1158465" className="hover:underline text-xs sm:text-sm">
                     +977 9851158465
                   </a>
                 </div>

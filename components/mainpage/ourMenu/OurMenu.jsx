@@ -8,10 +8,10 @@ export default function OurMenu() {
   return (
     <div>
       {/* Our Menu Divider */}
-      <div className="flex items-center justify-center gap-4 py-8 px-8">
-        <div className="h-px bg-linear-to-r from-transparent via-[#D97634] to-transparent w-80" />
-        <div className="flex items-center gap-2 text-[#D97634] text-sm tracking-widest">
-          <span className="text-xl">
+      <div className="flex items-center justify-center gap-2 sm:gap-4 py-6 sm:py-8 px-4 sm:px-8">
+        <div className="h-px bg-linear-to-r from-transparent via-[#D97634] to-transparent w-12 sm:w-80" />
+        <div className="flex items-center gap-2 text-[#D97634] text-xs sm:text-sm tracking-widest whitespace-nowrap">
+          <span className="text-lg sm:text-xl">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -33,27 +33,27 @@ export default function OurMenu() {
           </span>
           <span>OUR MENU</span>
         </div>
-        <div className="h-px bg-linear-to-r from-transparent via-[#D97634] to-transparent w-80" />
+        <div className="h-px bg-linear-to-r from-transparent via-[#D97634] to-transparent w-12 sm:w-80" />
       </div>
 
       {/* Dishes We Offer Section */}
-      <section className="px-8 py-10 max-w-7xl mx-auto">
+      <section className="px-4 sm:px-8 py-3 sm:py-10 max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
         >
-          <h2 className="text-4xl font-bold text-center mb-6">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-4 sm:mb-6">
             Dishes We Offer
           </h2>
-          <p className="text-gray-400 text-center leading-relaxed max-w-2xl mx-auto mb-16">
+          <p className="text-gray-400 text-center text-sm sm:text-base leading-relaxed max-w-2xl mx-auto mb-12 sm:mb-16">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
             eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
             ad minim veniam.
           </p>
 
-          <div className="grid max-sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mb-12">
+          <div className="grid max-sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 mb-12">
             {[
               {
                 title: "Veg / Chicken Thali",
@@ -123,7 +123,7 @@ export default function OurMenu() {
           <div className="text-center">
             <motion.button
               onClick={() => router.push("/menu")}
-              className="px-10 py-4 bg-[#D97634] text-white font-semibold tracking-wide hover:bg-[#E88844] transition-all duration-300 shadow-lg hover:shadow-xl"
+              className="px-6 sm:px-10 py-3 sm:py-4 bg-[#D97634] text-white font-semibold text-sm sm:text-base tracking-wide hover:bg-[#E88844] transition-all duration-300 shadow-lg hover:shadow-xl"
               whileHover={{ y: -2, scale: 1.05 }}
               whileTap={{ scale: 0.98 }}
             >

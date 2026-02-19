@@ -60,7 +60,7 @@ export default function MainPage() {
       </div>
       <Navbar />
 
-      <section className="relative px-6 py-12 md:px-8 pt-30 md:pt-33 flex flex-col-reverse lg:flex-row items-center justify-between max-w-7xl mx-auto gap-12 overflow-hidden">
+      <section className="relative px-4 sm:px-6  sm:py-12 md:px-8 pt-25 sm:pt-30 md:pt-33 flex flex-col-reverse lg:flex-row items-center justify-between max-w-7xl mx-auto gap-8 sm:gap-12 overflow-hidden">
         {/* Text Content */}
         <motion.div
           className="flex-1 text-center lg:text-left"
@@ -69,7 +69,7 @@ export default function MainPage() {
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.3 }}
         >
-          <h1 className="text-3xl md:text-4xl lg:text-6xl font-bold mb-6 leading-tight">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-bold mb-4 sm:mb-6 leading-tight">
             Authentic{" "}
             <span
               className="text-[#E9842C]"
@@ -82,18 +82,18 @@ export default function MainPage() {
           </h1>
 
           {/* Decorative Line - Centered on mobile, left-aligned on desktop */}
-          <div className="mx-auto lg:mx-0 bg-linear-to-r from-transparent via-[#E9842C] to-transparent w-48 h-1 mb-8" />
+          <div className="mx-auto lg:mx-0 bg-linear-to-r from-transparent via-[#E9842C] to-transparent w-32 sm:w-48 h-1 mb-6 sm:mb-8" />
 
-          <p className="text-gray-400 text-base md:text-lg leading-relaxed mb-10 max-w-lg mx-auto lg:mx-0">
+          <p className="text-gray-400 text-sm sm:text-base md:text-lg leading-relaxed mb-6 sm:mb-10 max-w-lg mx-auto lg:mx-0">
             Experience the heritage of the Himalayas through our traditional
             Thakali flavors, crafted with locally sourced ingredients and
             time-honored recipes.
           </p>
 
-          <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4 md:gap-6">
+          <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-3 sm:gap-4 md:gap-6">
             <motion.button
               onClick={() => router.push("/menu")}
-              className="px-8 py-4 bg-[#E9842C] text-black rounded font-semibold tracking-wide shadow-lg"
+              className="px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base bg-[#E9842C] text-black rounded font-semibold tracking-wide shadow-lg"
               whileHover={{ y: -3, backgroundColor: "#E88844" }}
               whileTap={{ scale: 0.95 }}
             >
@@ -102,7 +102,7 @@ export default function MainPage() {
 
             <motion.button
               onClick={() => router.push("/aboutus")}
-              className="px-8 py-4 border-2 border-[#D97634] rounded text-[#D97634] font-semibold tracking-wide"
+              className="px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base border-2 border-[#D97634] rounded text-[#D97634] font-semibold tracking-wide"
               whileHover={{ y: -3, backgroundColor: "#E9842C", color: "#fff" }}
               whileTap={{ scale: 0.95 }}
             >

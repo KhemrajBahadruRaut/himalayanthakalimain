@@ -94,13 +94,13 @@ const BlogListingPage = () => {
               <div className="h-px md:w-56 bg-linear-to-l from-transparent to-[#D97634]" />
             </div>
 
-            <h1 className="mb-4 text-4xl font-serif md:text-5xl">News & Updates</h1>
+            <h1 className="mb-4 text-2xl sm:text-4xl font-serif md:text-5xl">News & Updates</h1>
             <p className="mx-auto max-w-2xl text-gray-400">
               Discover our latest stories, updates, and events from Himalayan Thakali.
             </p>
           </header>
 
-          <div className="mb-8 flex justify-end">
+          <div className="mb-8 flex justify-center sm:justify-end">
             <select
               aria-label="Sort blog posts"
               className="cursor-pointer rounded border border-[#D97634] bg-transparent px-4 py-2 text-sm text-[#D97634] transition-colors"

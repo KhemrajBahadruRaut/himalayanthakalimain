@@ -5,10 +5,10 @@ const ShortIntro = () => {
   return (
     <div>
       {/* Short Intro Divider */}
-      <div className="flex items-center justify-center gap-4 pt-20 px-8">
-        <div className="h-px  bg-linear-to-r from-transparent via-[#E9842C] to-transparent w-80" />
-        <div className="flex items-center gap-2 text-[#E9842C] text-sm tracking-widest">
-          <span className="text-xl">
+      <div className="flex items-center justify-center gap-2 sm:gap-4 pt-12 sm:pt-20 px-4 sm:px-8">
+        <div className="h-px bg-linear-to-r from-transparent via-[#E9842C] to-transparent w-12 sm:w-80" />
+        <div className="flex items-center gap-2 text-[#E9842C] text-xs sm:text-sm tracking-widest whitespace-nowrap">
+          <span className="text-lg sm:text-xl">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="40"
@@ -24,11 +24,11 @@ const ShortIntro = () => {
           <span>SHORT INTRO</span>
           {/* <span className="text-xl">✦</span> */}
         </div>
-        <div className="h-px bg-linear-to-r from-transparent via-[#E9842C] to-transparent w-80" />
+        <div className="h-px bg-linear-to-r from-transparent via-[#E9842C] to-transparent w-12 sm:w-80" />
       </div>
 
       {/* About Section */}
-      <section className="relative px-8 py-5  max-w-6xl mx-auto">
+      <section className="relative  sm:px-8  sm:py-12 max-w-6xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -40,11 +40,11 @@ const ShortIntro = () => {
             <div className="hidden sm:flex absolute top-0 left-0 w-32 h-32 border-t-4 border-l-4 border-[#E9842C]" />
           </div>
 
-          <h2 className="text-3xl sm:text-4xl  font-bold text-center mb-12">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-8 sm:mb-12">
             About Himalayan Thakali
           </h2>
 
-          <p className="text-gray-300 sm:px-8 lg:px-0 text-center leading-relaxed max-w-4xl  mx-auto text-lg">
+          <p className="text-gray-300 px-4 sm:px-8 lg:px-0 text-center leading-relaxed max-w-4xl mx-auto text-sm sm:text-base lg:text-lg">
             Nestled in the heart of Mid Baneshwor, Himalayan Thakali brings you
             the true essence of the Thakali Bhanchha — a culinary tradition
             celebrated for its balance, purity, and legendary hospitality.

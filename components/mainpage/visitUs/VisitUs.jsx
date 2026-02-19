@@ -4,10 +4,10 @@ const VisitUs = () => {
   return (
     <div>
           {/* Visit Us Divider */}
-      <div className="flex items-center justify-center gap-4 pt-18 py-10 px-8">
-        <div className="h-px bg-linear-to-r from-transparent via-[#E9842C] to-transparent w-80" />
-        <div className="flex items-center gap-2 text-[#D97634] text-sm tracking-widest">
-          <span className="text-xl">
+      <div className="flex items-center justify-center gap-2 sm:gap-4 pt-18 py-8 sm:py-10 px-4 sm:px-8">
+        <div className="h-px bg-linear-to-r from-transparent via-[#E9842C] to-transparent w-12 sm:w-80" />
+        <div className="flex items-center gap-2 text-[#D97634] text-xs sm:text-sm tracking-widest">
+          <span className="text-lg sm:text-xl">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="30"
@@ -22,15 +22,15 @@ const VisitUs = () => {
           </span>
           <span>VISIT US</span>
         </div>
-        <div className="h-px bg-linear-to-r from-transparent via-[#E9842C] to-transparent w-80" />
+        <div className="h-px bg-linear-to-r from-transparent via-[#E9842C] to-transparent w-12 sm:w-80" />
       </div>
 
       {/* Contact Cards */}
-      <section className="px-8 pb-20 max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      <section className="px-4 sm:px-8 pb-16 sm:pb-20 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
           {/* Visit Us Card */}
           <motion.div
-            className="bg-[#2A2A2A] p-12 text-center hover:bg-[#333333] transition-all duration-300 group relative overflow-hidden"
+            className="bg-[#2A2A2A] p-6 sm:p-8 lg:p-12 text-center hover:bg-[#333333] transition-all duration-300 group relative overflow-hidden"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
@@ -40,8 +40,8 @@ const VisitUs = () => {
             <div className="absolute inset-0 bg-linear-to-br from-[#D97634]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
             <div className="relative z-10">
-              <div className="w-20 h-20 rounded-full bg-[#D97634] flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                <span className="text-3xl">
+              <div className="w-16 sm:w-20 h-16 sm:h-20 rounded-full bg-[#D97634] flex items-center justify-center mx-auto mb-4 sm:mb-6 group-hover:scale-110 transition-transform duration-300">
+                <span className="text-2xl sm:text-3xl">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="50"
@@ -60,11 +60,16 @@ const VisitUs = () => {
                 </span>
               </div>
 
-              <h3 className="text-xl font-bold mb-3">Visit Us</h3>
-              <p className="text-[#D97634] font-semibold mb-4">
+              <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3">Visit Us</h3>
+              <a
+                href="https://maps.app.goo.gl/oZoFbKTSMPeSeBSt5"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#D97634] font-semibold mb-3 sm:mb-4 text-sm sm:text-base hover:underline cursor-pointer block"
+              >
                 Mid Baneshwor, Kathmandu
-              </p>
-              <p className="text-gray-400 text-sm leading-relaxed">
+              </a>
+              <p className="text-gray-400 text-xs sm:text-sm leading-relaxed">
                 Nestled in the heart of Kathmandu's most vibrant cultural
                 district
               </p>
@@ -73,7 +78,7 @@ const VisitUs = () => {
 
           {/* Opening Hours Card */}
           <motion.div
-            className="bg-[#2A2A2A] p-12 text-center hover:bg-[#333333] transition-all duration-300 group relative overflow-hidden"
+            className="bg-[#2A2A2A] p-6 sm:p-8 lg:p-12 text-center hover:bg-[#333333] transition-all duration-300 group relative overflow-hidden"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
@@ -83,8 +88,8 @@ const VisitUs = () => {
             <div className="absolute inset-0 bg-linear-to-br from-[#D97634]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
             <div className="relative z-10">
-              <div className="w-20 h-20 rounded-full bg-[#D97634] flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                <span className="text-3xl">
+              <div className="w-16 sm:w-20 h-16 sm:h-20 rounded-full bg-[#D97634] flex items-center justify-center mx-auto mb-4 sm:mb-6 group-hover:scale-110 transition-transform duration-300">
+                <span className="text-2xl sm:text-3xl">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="35"
@@ -99,11 +104,11 @@ const VisitUs = () => {
                 </span>
               </div>
 
-              <h3 className="text-xl font-bold mb-3">Opening Hours</h3>
-              <p className="text-[#D97634] font-semibold mb-4">
+              <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3">Opening Hours</h3>
+              <p className="text-[#D97634] font-semibold mb-3 sm:mb-4 text-sm sm:text-base">
                 10:00 AM - 10:00 PM
               </p>
-              <p className="text-gray-400 text-sm leading-relaxed">
+              <p className="text-gray-400 text-xs sm:text-sm leading-relaxed">
                 We welcome you to experience our culinary artistry throughout
                 the day
               </p>
@@ -112,7 +117,7 @@ const VisitUs = () => {
 
           {/* Contact Us Card */}
           <motion.div
-            className="bg-[#2A2A2A] p-12 text-center hover:bg-[#333333] transition-all duration-300 group relative overflow-hidden"
+            className="bg-[#2A2A2A] p-6 sm:p-8 lg:p-12 text-center hover:bg-[#333333] transition-all duration-300 group relative overflow-hidden"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
@@ -122,8 +127,8 @@ const VisitUs = () => {
             <div className="absolute inset-0 bg-linear-to-br from-[#D97634]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
             <div className="relative z-10">
-              <div className="w-20 h-20 rounded-full bg-[#D97634] flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                <span className="text-3xl">
+              <div className="w-16 sm:w-20 h-16 sm:h-20 rounded-full bg-[#D97634] flex items-center justify-center mx-auto mb-4 sm:mb-6 group-hover:scale-110 transition-transform duration-300">
+                <span className="text-2xl sm:text-3xl">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="40"
@@ -138,14 +143,17 @@ const VisitUs = () => {
                 </span>
               </div>
 
-              <h3 className="text-xl font-bold mb-3">Contact Us</h3>
-              <p className="text-[#D97634] font-semibold mb-2">
+              <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3">Contact Us</h3>
+              <a
+                href="tel:+977-9851158465"
+                className="text-[#D97634] font-semibold mb-2 text-sm sm:text-base hover:underline cursor-pointer block"
+              >
                 +977 9851158465
-              </p>
+              </a>
               {/* <p className="text-[#D97634] font-semibold mb-4">
                 +977 0000000000
               </p> */}
-              <p className="text-gray-400 text-sm leading-relaxed">
+              <p className="text-gray-400 text-xs sm:text-sm leading-relaxed">
                 You can contact us directly for any queries
               </p>
             </div>
