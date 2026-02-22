@@ -1,9 +1,9 @@
-import React from 'react'
-import {motion} from "framer-motion";
+import React from "react";
+import { motion } from "framer-motion";
 const VisitUs = () => {
   return (
     <div>
-          {/* Visit Us Divider */}
+      {/* Visit Us Divider */}
       <div className="flex items-center justify-center gap-2 sm:gap-4 pt-18 py-8 sm:py-10 px-4 sm:px-8">
         <div className="h-px bg-linear-to-r from-transparent via-[#E9842C] to-transparent w-12 sm:w-80" />
         <div className="flex items-center gap-2 text-[#D97634] text-xs sm:text-sm tracking-widest">
@@ -60,7 +60,9 @@ const VisitUs = () => {
                 </span>
               </div>
 
-              <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3">Visit Us</h3>
+              <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3">
+                Visit Us
+              </h3>
               <a
                 href="https://maps.app.goo.gl/oZoFbKTSMPeSeBSt5"
                 target="_blank"
@@ -104,7 +106,9 @@ const VisitUs = () => {
                 </span>
               </div>
 
-              <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3">Opening Hours</h3>
+              <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3">
+                Opening Hours
+              </h3>
               <p className="text-[#D97634] font-semibold mb-3 sm:mb-4 text-sm sm:text-base">
                 10:00 AM - 10:00 PM
               </p>
@@ -143,7 +147,9 @@ const VisitUs = () => {
                 </span>
               </div>
 
-              <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3">Contact Us</h3>
+              <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3">
+                Contact Us
+              </h3>
               <a
                 href="tel:+977-9851158465"
                 className="text-[#D97634] font-semibold mb-2 text-sm sm:text-base hover:underline cursor-pointer block"
@@ -160,9 +166,8 @@ const VisitUs = () => {
           </motion.div>
         </div>
       </section>
-
     </div>
-  )
-}
+  );
+};
 
-export default VisitUs
+export default VisitUs;

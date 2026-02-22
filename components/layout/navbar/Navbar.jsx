@@ -83,7 +83,7 @@ const Navbar = () => {
 
       {/* Mobile */}
       <div className="lg:hidden px-4 flex justify-between items-center ">
-        <img src="/logo/himalayan-thakalil-logo.png" className="w-24" />
+        <img src="/logo/himalayan-thakalil-logo.png" className="w-18" />
         <button onClick={() => setOpen(!open)} className="text-white">
           ☰
         </button>
