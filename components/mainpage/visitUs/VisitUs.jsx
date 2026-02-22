@@ -72,7 +72,7 @@ const VisitUs = () => {
                 Mid Baneshwor, Kathmandu
               </a>
               <p className="text-gray-400 text-xs sm:text-sm leading-relaxed">
-                Nestled in the heart of Kathmandu's most vibrant cultural
+                Nestled in the heart of Kathmandu&apos;s most vibrant cultural
                 district
               </p>
             </div>

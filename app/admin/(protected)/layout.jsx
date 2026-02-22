@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { LayoutDashboard, LogOut, Menu, X} from "lucide-react";
 import { Contact } from "lucide-react";
 import { MenuIcon } from "lucide-react";
@@ -19,10 +20,15 @@ export default function AdminLayout({ children }) {
   useEffect(() => {
     const token = localStorage.getItem("admin_token");
     if (!token) {
-      router.push("/admin"); 
-    } else {
-      setIsLoading(false);
+      router.push("/admin");
+      return;
     }
+
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 0);
+
+    return () => clearTimeout(timer);
   }, [router]);
 
   const handleLogout = () => {
@@ -47,7 +53,13 @@ export default function AdminLayout({ children }) {
       `}>
            <div className="flex items-center justify-between h-16 px-6 border-b border-slate-800">
           <span className="text-xl flex font-bold tracking-wider  ">
-            <img src="/logo/himalayan-thakalil-logo.png" className="w-20" alt="" />
+            <Image
+              src="/logo/himalayan-thakalil-logo.png"
+              alt="Himalayan Thakali logo"
+              width={80}
+              height={80}
+              className="w-20 h-auto"
+            />
           </span>
             <span className="text-[#E9842C] flex font-bold tracking-wider items-baseline">ADMIN</span>
           <button

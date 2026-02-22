@@ -78,12 +78,7 @@ export default function CareerPage() {
     }
   };
 
-  useEffect(() => {
-    fetchJobs();
-    fetchCareerEmail();
-  }, []);
-
-  const fetchJobs = async () => {
+  async function fetchJobs() {
     try {
       const res = await fetch(`${API}/get_openings.php`);
       const data = await res.json();
@@ -93,9 +88,9 @@ export default function CareerPage() {
     } catch (error) {
       console.error("Failed to fetch jobs:", error);
     }
-  };
+  }
 
-  const fetchCareerEmail = async () => {
+  async function fetchCareerEmail() {
     try {
       const res = await fetch(`${API}/get_career_email.php`);
       const data = await res.json();
@@ -105,7 +100,17 @@ export default function CareerPage() {
     } catch (error) {
       console.error("Failed to fetch email:", error);
     }
-  };
+  }
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchJobs();
+      fetchCareerEmail();
+    }, 0);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   const benefits = [
     {
       icon: (
@@ -450,7 +455,7 @@ export default function CareerPage() {
         {/* ================= FOOTER EMAIL SECTION ================= */}
         <div className="text-center mt-16 pt-12 border-t border-[#333]">
           <p className="text-[#D97634] text-base">
-            Don't see any post for you?{" "}
+            Don&apos;t see any post for you?{" "}
             <a
               href={`mailto:${careerEmail}`}
               className="underline hover:text-[#c56829] transition-colors duration-300"

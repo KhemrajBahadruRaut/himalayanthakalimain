@@ -109,9 +109,12 @@ const Testimonials = () => {
 
   // Auto-slide
   useEffect(() => {
-    autoSlideRef.current = setInterval(next, 4500)
+    autoSlideRef.current = setInterval(() => {
+      setDirection(1)
+      setCurrent((prevCurrent) => (prevCurrent + 1) % testimonials.length)
+    }, 4500)
     return () => clearInterval(autoSlideRef.current)
-  }, [current])
+  }, [])
 
   // Touch / mouse drag
   const handleDragStart = (e) => {
@@ -121,7 +124,13 @@ const Testimonials = () => {
     if (dragStartX.current === null) return
     const endX = e.type === "touchend" ? e.changedTouches[0].clientX : e.clientX
     const diff = dragStartX.current - endX
-    if (Math.abs(diff) > 40) diff > 0 ? next() : prev()
+    if (Math.abs(diff) > 40) {
+      if (diff > 0) {
+        next()
+      } else {
+        prev()
+      }
+    }
     dragStartX.current = null
   }
 

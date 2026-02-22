@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Navbar from "../../components/layout/navbar/Navbar";
 import Footer from "../../components/layout/footer/Footer";
 
@@ -273,7 +272,7 @@ export default function CareerPage() {
 
           {/* Job Listings */}
           <div className="space-y-6">
-            {jobListings.map((job, index) => (
+            {jobListings.map((job) => (
               <div
                 key={job.id}
                 className="job-card animate-slideInLeft bg-[#2A2A2A] rounded-lg overflow-hidden hover:shadow-[0_8px_25px_rgba(217,118,52,0.15)] transition-all duration-300"
@@ -378,7 +377,7 @@ export default function CareerPage() {
         {/* Footer CTA */}
         <div className="text-center mt-16 pt-12 border-t border-[#333]">
           <p className="text-[#D97634] text-base">
-            Don't see any post for you?{" "}
+            Don&apos;t see any post for you?{" "}
             <a
               href="mailto:abc@example.com"
               className="underline hover:text-[#c56829] transition-colors duration-300"

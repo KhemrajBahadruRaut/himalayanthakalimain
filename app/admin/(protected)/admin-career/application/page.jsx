@@ -5,7 +5,6 @@ import {
   ExternalLink, 
   Search, 
   Download, 
-  User, 
   Calendar, 
   Mail,
   Filter

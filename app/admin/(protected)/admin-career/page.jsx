@@ -53,7 +53,7 @@ export default function CareerAdmin() {
     }
   }, [showToast]);
 
-  const fetchEmail = async () => {
+  const fetchEmail = useCallback(async () => {
     try {
       const res = await fetch(`${API}/get_career_email.php`);
       const data = await res.json();
@@ -62,12 +62,12 @@ export default function CareerAdmin() {
     } catch {
       showToast("Failed to load email.", "error");
     }
-  };
+  }, [showToast]);
 
   useEffect(() => {
     fetchJobs();
     fetchEmail();
-  }, [fetchJobs]);
+  }, [fetchJobs, fetchEmail]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });

@@ -1,8 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import Image from "next/image";
 
 const Navbar = dynamic(() => import("../../components/layout/navbar/Navbar"), {
   loading: () => <div className="h-24" />,
@@ -13,11 +11,7 @@ const Footer = dynamic(() => import("../../components/layout/footer/Footer"), {
 });
 
 export default function HimalayantThakaliAbout() {
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    setIsVisible(true);
-  }, []);
+  const isVisible = true;
 
   return (
     <div className="min-h-screen bg-[#1E1E1E] text-white overflow-hidden">
@@ -195,7 +189,7 @@ export default function HimalayantThakaliAbout() {
             <br />
             <br />
             The Art of the Thakali Bhanchha Our kitchen is built on the
-            principles of the traditional Thakali Bhanchha. We don't rely on
+            principles of the traditional Thakali Bhanchha. We don&apos;t rely on
             modern shortcuts; instead, we honor the slow-cooking methods and
             specific spice blends that have made Thakali cuisine the gold
             standard of Himalayan comfort food.

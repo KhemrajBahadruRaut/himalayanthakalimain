@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence, useScroll } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 
 const LEFT_MENU = [
@@ -57,16 +58,18 @@ const Navbar = () => {
             />
           ))}
 
-          <a href="/">
+          <Link href="/" aria-label="Himalayan Thakali Home">
 
-          <img
-          alt="himalayah thakali logo"
+          <Image
+            alt="himalayah thakali logo"
             src="/logo/himalayan-thakalil-logo.png"
-            className={`transition-all duration-300 ${
+            width={112}
+            height={112}
+            className={`h-auto transition-all duration-300 ${
               shrink ? "w-23" : "w-28"
             }`}
-            />
-            </a>
+          />
+            </Link>
 
           {RIGHT_MENU.map((item) => (
             <NavItem
@@ -83,7 +86,13 @@ const Navbar = () => {
 
       {/* Mobile */}
       <div className="lg:hidden px-4 flex justify-between items-center ">
-        <img src="/logo/himalayan-thakalil-logo.png" className="w-18" />
+        <Image
+          src="/logo/himalayan-thakalil-logo.png"
+          className="w-18 h-auto"
+          alt="himalayan thakali logo"
+          width={72}
+          height={72}
+        />
         <button onClick={() => setOpen(!open)} className="text-white">
           ☰
         </button>
