@@ -13,8 +13,8 @@ const Footer = dynamic(() => import("../../components/layout/footer/Footer"), {
   loading: () => <div className="h-40" />,
 });
 
-const API = `${process.env.NEXT_PUBLIC_API_BASE || "http://localhost/himalayanthakali_backend"}/menu`;
-// const API = `${process.env.NEXT_PUBLIC_API_BASE || "https://api.himalayanthakali.com/himalayanthakali_backend"}/menu`;
+// const API = `${process.env.NEXT_PUBLIC_API_BASE || "http://localhost/himalayanthakali_backend"}/menu`;
+const API = `${process.env.NEXT_PUBLIC_API_BASE || "https://api.himalayanthakali.com/himalayanthakali_backend"}/menu`;
 
 function MenuCategorySkeleton() {
   return (
