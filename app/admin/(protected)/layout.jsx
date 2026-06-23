@@ -12,11 +12,11 @@ import { Newspaper } from "lucide-react";
 
 export default function AdminLayout({ children }) {
   const router = useRouter();
-  const pathname = usePathname(); // Get current URL to highlight sidebar
+  const pathname = usePathname(); 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // 1. Protect Routes (Check for token)
+  // 1. Check for token)
   useEffect(() => {
     const token = localStorage.getItem("admin_token");
     if (!token) {
@@ -41,12 +41,10 @@ export default function AdminLayout({ children }) {
   return (
     <div className="flex h-screen bg-gray-50 text-gray-900 font-sans">
       
-      {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
         <div className="fixed inset-0 z-20 bg-black/50 lg:hidden" onClick={() => setIsSidebarOpen(false)} />
       )}
 
-      {/* --- SIDEBAR --- */}
       <aside className={`
         fixed lg:static inset-y-0 left-0 z-30 w-64 bg-slate-900 text-white transform transition-transform duration-200 ease-in-out
         ${isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
@@ -78,9 +76,7 @@ export default function AdminLayout({ children }) {
           <SidebarItem icon={<GalleryHorizontalEndIcon size={20} />} text="Gallery" href="/admin/admin-gallery" active={pathname === "/admin/admin-gallery"} />
           {/* <SidebarItem icon={<Workflow size={20} />} text="Career" href="/admin/admin-career" active={pathname === "/admin/admin-career"} /> */}
           <SidebarItem icon={<Newspaper size={20} />} text="Blogs" href="/admin/admin-blogs" active={pathname === "/admin/admin-blogs"} />
-          {/* 
-          <SidebarItem icon={<Settings size={20} />} text="Settings" href="/admin/settings" active={pathname === "/admin/settings"} />
-           */}
+          {/* <SidebarItem icon={<Settings size={20} />} text="Settings" href="/admin/settings" active={pathname === "/admin/settings"} /> */}
         </nav>
 
         <div className="p-4 border-t border-slate-800">
@@ -90,7 +86,7 @@ export default function AdminLayout({ children }) {
         </div>
       </aside>
 
-      {/* --- CONTENT AREA --- */}
+      {/*  CONTENT  */}
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
         {/* Header */}
         <header className="flex items-center justify-between h-16 px-6 bg-white border-b border-gray-200 shadow-sm shrink-0">

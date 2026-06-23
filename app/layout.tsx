@@ -87,6 +87,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       lang="en"
       className={`${inter.variable} scroll-smooth`}
       data-scroll-behavior="smooth"
+      data-coolstyles-extension="installed"
+      data-coolstyles-extension-version="1.9.0"
     >
       <body className=" font-inter antialiased bg-white text-slate-900">
         <ToastProvider>
