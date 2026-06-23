@@ -115,7 +115,7 @@ const Footer = () => {
                   alt="GR8 Nepal Private Limited"
                   width={48}
                   height={32}
-                  className="h-8 w-12"
+                  className="h-10 w-12"
                 />
               </a>
             </div>

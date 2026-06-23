@@ -17,8 +17,8 @@ import {
 import { useToast } from "@/components/providers/ToastProvider";
 import Skeleton from "@/components/ui/Skeleton";
 
-// const API = "https://api.himalayanthakali.com/himalayanthakali_backend/menu";
-const API = "http://localhost/himalayanthakali_backend/menu";
+const API = "https://api.himalayanthakali.com/himalayanthakali_backend/menu";
+// const API = "http://localhost/himalayanthakali_backend/menu";
 
 function toCurrency(value) {
   const amount = Number(value);
@@ -520,7 +520,7 @@ export default function MenuAdmin() {
                     onChange={(e) => setForm({ ...form, description: e.target.value })}
                     className="md:col-span-2 h-24 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm outline-none transition focus:border-[#E9842C] focus:bg-white"
                   />
-                  <div className="md:col-span-2">
+                  {/* <div className="md:col-span-2">
                     <p className="mb-1.5 text-xs font-medium text-slate-500">Image <span className="font-normal text-slate-400">(optional)</span></p>
                     <div className="flex items-center gap-3 rounded-xl border border-dashed border-slate-300 bg-slate-50 p-3">
                       <ImageIcon className="h-4 w-4 text-slate-400" />
@@ -540,7 +540,7 @@ export default function MenuAdmin() {
                         <div className="border-t border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-500">{form.image?.name}</div>
                       </div>
                     )}
-                  </div>
+                  </div> */}
                   <button onClick={addItem} className="md:col-span-2 rounded-xl bg-slate-900 py-2.5 text-sm font-semibold text-white transition hover:bg-black">
                     Add Item
                   </button>

@@ -56,91 +56,90 @@ function MenuListSkeleton() {
   );
 }
 
-type SelectedItem = MenuItem & { categoryName?: string };
+// type SelectedItem = MenuItem & { categoryName?: string };
+// function ItemModal({
+//   item,
+//   onClose,
+// }: {
+//   item: SelectedItem;
+//   onClose: () => void;
+// }) {
+//   // Resolve image src
+//   const imageSrc = item.image_url
+//     ? item.image_url.startsWith("http")
+//       ? item.image_url
+//       : `https://api.himalayanthakali.com/himalayanthakali_backend/menu/${item.image_url.replace(/^\/+/, "")}`
+//       // : `http://localhost/himalayanthakali_backend/menu/${item.image_url.replace(/^\/+/, "")}`
+//     : item.image
+//     ? `${API}/uploads/${item.image}`
+//     : null;
 
-function ItemModal({
-  item,
-  onClose,
-}: {
-  item: SelectedItem;
-  onClose: () => void;
-}) {
-  // Resolve image src
-  const imageSrc = item.image_url
-    ? item.image_url.startsWith("http")
-      ? item.image_url
-      : `https://api.himalayanthakali.com/himalayanthakali_backend/menu/${item.image_url.replace(/^\/+/, "")}`
-      // : `http://localhost/himalayanthakali_backend/menu/${item.image_url.replace(/^\/+/, "")}`
-    : item.image
-    ? `${API}/uploads/${item.image}`
-    : null;
+//   return (
+//     <div
+//       className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4 backdrop-blur-sm"
+//       onClick={onClose}
+//       role="dialog"
+//       aria-modal="true"
+//       aria-label={`Details for ${item.name}`}
+//     >
+//       <div
+//         className="relative w-full max-w-sm rounded-lg border border-[#D97634]/20 bg-[#1E1E1E] p-6"
+//         onClick={(e) => e.stopPropagation()}
+//       >
+//         <button
+//           type="button"
+//           onClick={onClose}
+//           aria-label="Close"
+//           className="absolute right-4 top-4 text-gray-500 transition-colors hover:text-white"
+//         >
+//           ✕
+//         </button>
 
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4 backdrop-blur-sm"
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
-      aria-label={`Details for ${item.name}`}
-    >
-      <div
-        className="relative w-full max-w-sm rounded-lg border border-[#D97634]/20 bg-[#1E1E1E] p-6"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label="Close"
-          className="absolute right-4 top-4 text-gray-500 transition-colors hover:text-white"
-        >
-          ✕
-        </button>
+//         {imageSrc ? (
+//           <div className="relative mx-auto mb-5 h-48 w-48 overflow-hidden rounded-full border border-[#D97634]/30 bg-gray-800">
+//             <Image
+//               src={imageSrc}
+//               alt={item.name}
+//               fill
+//               sizes="192px"
+//               className="object-cover"
+//             />
+//           </div>
+//         ) : (
+//           <div className="mx-auto mb-5 flex h-48 w-48 items-center justify-center rounded-full border border-[#D97634]/20 bg-white/5">
+//             <span className="text-4xl opacity-40">🍽️</span>
+//           </div>
+//         )}
 
-        {imageSrc ? (
-          <div className="relative mx-auto mb-5 h-48 w-48 overflow-hidden rounded-full border border-[#D97634]/30 bg-gray-800">
-            <Image
-              src={imageSrc}
-              alt={item.name}
-              fill
-              sizes="192px"
-              className="object-cover"
-            />
-          </div>
-        ) : (
-          <div className="mx-auto mb-5 flex h-48 w-48 items-center justify-center rounded-full border border-[#D97634]/20 bg-white/5">
-            <span className="text-4xl opacity-40">🍽️</span>
-          </div>
-        )}
+//         <h2 className="mb-1 text-center font-serif text-xl font-semibold text-white">
+//           {item.name}
+//         </h2>
 
-        <h2 className="mb-1 text-center font-serif text-xl font-semibold text-white">
-          {item.name}
-        </h2>
+//         {item.subcategory && (
+//           <p className="mb-2 text-center text-xs font-light tracking-widest text-[#D97634]/70 uppercase">
+//             {item.subcategory}
+//           </p>
+//         )}
 
-        {item.subcategory && (
-          <p className="mb-2 text-center text-xs font-light tracking-widest text-[#D97634]/70 uppercase">
-            {item.subcategory}
-          </p>
-        )}
+//         {item.description && (
+//           <p className="mb-4 text-center text-sm leading-relaxed text-gray-400">
+//             {item.description}
+//           </p>
+//         )}
 
-        {item.description && (
-          <p className="mb-4 text-center text-sm leading-relaxed text-gray-400">
-            {item.description}
-          </p>
-        )}
-
-        <p className="text-center text-lg font-medium tracking-wide text-[#D97634]">
-          RS. {item.price}/-
-        </p>
-      </div>
-    </div>
-  );
-}
+//         <p className="text-center text-lg font-medium tracking-wide text-[#D97634]">
+//           RS. {item.price}/-
+//         </p>
+//       </div>
+//     </div>
+//   );
+// }
 
 export default function MainMenu() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [activeCategory, setActiveCategory] = useState<number | null>(null);
   const [items, setItems] = useState<MenuItem[]>([]);
-  const [selectedItem, setSelectedItem] = useState<SelectedItem | null>(null);
+  // const [selectedItem, setSelectedItem] = useState<SelectedItem | null>(null);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [isItemsLoading, setIsItemsLoading] = useState(false);
 
@@ -190,14 +189,14 @@ export default function MainMenu() {
     };
   }, []);
 
-  useEffect(() => {
-    if (!selectedItem) return;
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setSelectedItem(null);
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [selectedItem]);
+  // useEffect(() => {
+  //   if (!selectedItem) return;
+  //   const handler = (e: KeyboardEvent) => {
+  //     if (e.key === "Escape") setSelectedItem(null);
+  //   };
+  //   window.addEventListener("keydown", handler);
+  //   return () => window.removeEventListener("keydown", handler);
+  // }, [selectedItem]);
 
   // Group items by subcategory
   const grouped = items.reduce<Record<string, MenuItem[]>>((acc, item) => {
@@ -308,27 +307,11 @@ export default function MainMenu() {
                           <div className="flex-1 border-b border-dashed border-white/10" />
                         </div>
                       )}
-                      <MenuList
-                        items={subItems}
-                        onSelect={(item) =>
-                          setSelectedItem({
-                            ...item,
-                            categoryName: activeCategoryName,
-                          })
-                        }
-                      />
+                      <MenuList items={subItems} />
                     </div>
                   ))
                 ) : (
-                  <MenuList
-                    items={items}
-                    onSelect={(item) =>
-                      setSelectedItem({
-                        ...item,
-                        categoryName: activeCategoryName,
-                      })
-                    }
-                  />
+                  <MenuList items={items} />
                 )}
 
                 {/* All prices notice */}
@@ -369,39 +352,32 @@ export default function MainMenu() {
 
         <Footer />
       </div>
-
-      {selectedItem && (
-        <ItemModal item={selectedItem} onClose={() => setSelectedItem(null)} />
-      )}
     </>
   );
 }
 
 function MenuList({
   items,
-  onSelect,
 }: {
   items: MenuItem[];
-  onSelect: (item: MenuItem) => void;
 }) {
   return (
     <div>
       {items.map((item) => (
-        <button
+        <div
           key={item.id}
-          type="button"
-          onClick={() => onSelect(item)}
-          className="group flex w-full items-baseline gap-3 border-b border-white/8 py-3.5 text-left transition-colors hover:border-[#D97634]/30"
+          className="group flex w-full items-baseline gap-3 border-b border-white/8 py-3.5 text-left transition-all duration-300 hover:border-[#D97634]/30"
         >
-          <span className="flex-1 text-sm font-medium uppercase tracking-wide text-white transition-colors group-hover:text-[#D97634]">
+          <span className="flex-1 text-sm font-medium uppercase tracking-wide text-white transition-all duration-300 group-hover:translate-x-1 group-hover:text-[#D97634]">
             {item.name}
           </span>
-          {/* dotted line */}
+
           <span className="min-w-0 flex-1 border-b border-dashed border-white/15 self-center" />
-          <span className="shrink-0 text-sm font-medium tracking-wide text-white">
+
+          <span className="shrink-0 text-sm font-medium tracking-wide text-white transition-colors duration-300 group-hover:text-[#D97634]">
             RS.&nbsp;{item.price}/-
           </span>
-        </button>
+        </div>
       ))}
     </div>
   );
